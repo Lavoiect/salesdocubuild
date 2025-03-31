@@ -1,4 +1,5 @@
-import { CircleEllipsisIcon, Dot, Edit, MoreVertical, PlusCircle, Settings, ShieldEllipsis, Trash, UserPlus } from 'lucide-react';
+
+import { CircleEllipsisIcon, Delete, Dot, Edit, MoreVertical, PlusCircle, Settings, ShieldEllipsis, Trash, UserPlus } from 'lucide-react';
 import Link from 'next/link';
 import React from 'react'
 import {
@@ -17,11 +18,14 @@ import {
 } from "@/components/ui/dropdown-menu"
 import Image from 'next/image';
 import { Workspace } from '@prisma/client';
-import { getWorkspaces } from '@/lib/queries';
+import { deleteDocument, getWorkspaces } from '@/lib/queries';
 import { CreateDocumentBnt } from './create-document-btn';
 import { CreateFromTemplateBtn } from './Create-from-template-btn';
 import { CreateFromTemplateInWorkspaceBtn } from './create-From-template-In-Workspace-btn';
 import { CreateDocumentAiBnt } from './create-document-ai';
+import { toast } from "@/components/ui/use-toast";
+import DeleteDocumentBtn from './delete-document-btn';
+
 
 type Props = {
     agencyId: string
@@ -33,6 +37,8 @@ type Props = {
 
 const WorkspaceCard = async ({ agencyId, workspace, documents }: Props) => {
    const workspaces = await getWorkspaces(agencyId)
+
+   
    
 
     return (
@@ -129,10 +135,13 @@ const WorkspaceCard = async ({ agencyId, workspace, documents }: Props) => {
                                 return (
                                     <div key={doc.id} className="flex items-center justify-between">
                                             {doc.name}
-                                        
+                                        <div className='flex items-center'>
                                         <Link href={`/agency/${agencyId}/documents/${doc.id}/${doc.id}/editor/${doc.DocumentPages[0].id}`}>
                                             <Edit />
                                         </Link>
+                                            <DeleteDocumentBtn documentId={doc.id}/>
+                                        </div>
+                                        
                                     </div>
                                 );
                             

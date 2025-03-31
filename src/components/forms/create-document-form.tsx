@@ -5,7 +5,7 @@ import { useModal } from "@/providers/modal-provider";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Document } from "@prisma/client";
 import { useRouter } from "next/navigation";
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useForm } from "react-hook-form";
 import { v4 } from "uuid";
 import { z } from "zod";
@@ -16,6 +16,8 @@ import { Input } from "../ui/input";
 import FileUpload from "../global/file-upload";
 import { Button } from "../ui/button";
 import Loading from "../global/loading";
+import { Textarea } from "../ui/textarea";
+import { set } from "date-fns";
 
 
 interface CreateDocumentProps {
@@ -40,7 +42,10 @@ const CreateDocumentForm: React.FC<CreateDocumentProps> = ({
             
         }
     })
+    const [showAIPrompt, setShowAIPrompt] = useState(false)
+    const [showDocDetails, setDocDetails] = useState(true)
 
+    
     useEffect(() => {
         if(defaultData){
             form.reset({
@@ -63,21 +68,23 @@ const CreateDocumentForm: React.FC<CreateDocumentProps> = ({
         )
         await saveActivityLogsNotification({
             agencyId: workspaceId,
-            description: `Updated funnel \ ${res.name}`,
+            description: `Updated document \ ${res.name}`,
             
         })
         if(res){
             toast({
                 title: 'Success',
-                description: 'Saved funnel details'
+                description: 'Saved document details'
             })}
         else 
             toast({
                 title: 'Opps',
-                description: 'Could not save funnel details',
+                description: 'Could not save document details',
                 variant: 'destructive'
             })
-        setClose()
+       // setClose()
+       setDocDetails(false)
+         setShowAIPrompt(true)
         router.refresh()
     }
 
@@ -87,77 +94,88 @@ const CreateDocumentForm: React.FC<CreateDocumentProps> = ({
                 <CardTitle>Document Details</CardTitle>
             </CardHeader>
             <CardContent>
-                <Form {...form}>
-                    <form 
-                        onSubmit={form.handleSubmit(onSubmit)}
-                        className="flex flex-col gap-4"
-                    >
-                        <FormField 
-                            disabled={isLoading}
-                            control={form.control}
-                            name="name"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Funnel Name</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Name" {...field}/>
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField 
-                            disabled={isLoading}
-                            control={form.control}
-                            name="description"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Funnel Description</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Funnel Description" {...field}/>
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
-                    <FormField 
-                            disabled={isLoading}
-                            control={form.control}
-                            name="subDomainName"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Sub Domain</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Sub Domain for funnel" {...field}/>
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
-
-                        <FormField 
-                            disabled={isLoading}
-                            control={form.control}
-                            name="favicon"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Favicon</FormLabel>
-                                    <FormControl>
-                                        <FileUpload 
-                                            apiEndpoint="subaccountLogo"
-                                            value={field.value}
-                                            onChange={field.onChange}
-                                        />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
-                        <Button 
-                            className="w-20 mt-4"
-                            disabled={isLoading}
-                            type="submit"
-                        >{form.formState.isSubmitting ? <Loading/> : 'Save'}</Button>
-                        
-                    </form>
-                </Form>
+                {showDocDetails && (
+                     <Form {...form}>
+                     <form 
+                         onSubmit={form.handleSubmit(onSubmit)}
+                         className="flex flex-col gap-4"
+                     >
+                         <FormField 
+                             disabled={isLoading}
+                             control={form.control}
+                             name="name"
+                             render={({field}) => (
+                                 <FormItem>
+                                     <FormLabel>Funnel Name</FormLabel>
+                                     <FormControl>
+                                         <Input placeholder="Name" {...field}/>
+                                     </FormControl>
+                                 </FormItem>
+                             )}
+                         />
+ 
+                         <FormField 
+                             disabled={isLoading}
+                             control={form.control}
+                             name="description"
+                             render={({field}) => (
+                                 <FormItem>
+                                     <FormLabel>Funnel Description</FormLabel>
+                                     <FormControl>
+                                         <Input placeholder="Funnel Description" {...field}/>
+                                     </FormControl>
+                                 </FormItem>
+                             )}
+                         />
+                     <FormField 
+                             disabled={isLoading}
+                             control={form.control}
+                             name="subDomainName"
+                             render={({field}) => (
+                                 <FormItem>
+                                     <FormLabel>Sub Domain</FormLabel>
+                                     <FormControl>
+                                         <Input placeholder="Sub Domain for funnel" {...field}/>
+                                     </FormControl>
+                                 </FormItem>
+                             )}
+                         />
+ 
+                         <FormField 
+                             disabled={isLoading}
+                             control={form.control}
+                             name="favicon"
+                             render={({field}) => (
+                                 <FormItem>
+                                     <FormLabel>Favicon</FormLabel>
+                                     <FormControl>
+                                         <FileUpload 
+                                             apiEndpoint="subaccountLogo"
+                                             value={field.value}
+                                             onChange={field.onChange}
+                                         />
+                                     </FormControl>
+                                 </FormItem>
+                             )}
+                         />
+                         <Button 
+                             className="w-20 mt-4"
+                             disabled={isLoading}
+                             type="submit"
+                         >{form.formState.isSubmitting ? <Loading/> : 'Save'}</Button>
+                         
+                     </form>
+                 </Form>
+                )}
+               
+                {showAIPrompt && (
+                     <div>
+                     <p>Enter details of what you want to create with AI.</p>
+                     <Textarea placeholder="Type here"/>
+                     <Button>Generate</Button>
+                 </div>
+                )}
+               
             </CardContent>
         </Card>
     )

@@ -1,9 +1,7 @@
 'use client'
 
 import CreateDocumentForm from "@/components/forms/create-document-form"
-import CreateWorkspaceForm from "@/components/forms/create-workspace-form"
 import CustomModal from "@/components/global/custom-modal"
-import { Button } from "@/components/ui/button"
 import { useModal } from "@/providers/modal-provider"
 import { Sparkle } from "lucide-react"
 
@@ -20,6 +18,7 @@ export const CreateDocumentAiBnt = ({ workspaceId }: Props) => {
                 subheading="Create a workspace for your documents"
             >
                 <CreateDocumentForm workspaceId={workspaceId}/>
+                
             </CustomModal>
         )
     }

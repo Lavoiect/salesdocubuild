@@ -526,6 +526,15 @@ export const deleteFunnelPage = async (funnelPageId: string) => {
     return res
 }
 
+export const deleteDocument =async (documentId:string) => {
+    const response = await db.document.delete({
+        where: {
+            id: documentId
+        }
+    })
+    return response;
+}
+
 
 export const getDocumentPageDetails =async (documentPageId:string) => {
     const res = await db.documentPage.findUnique({
