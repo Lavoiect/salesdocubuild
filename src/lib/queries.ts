@@ -339,7 +339,8 @@ export const upsertDocument = async (
     workspaceId : string,
     document: z.infer<typeof CreateDocumentFormSchema>,
     documentId: string,
-    documentPageContent?: string
+    documentPageContent?: string,
+    useAI?: boolean
 ) => {
     const response = await db.document.upsert({
         where: {id: documentId},
@@ -350,16 +351,19 @@ export const upsertDocument = async (
             workspaceId: workspaceId
         }
     })
-    upsertDocumentPage(
-        { 
-            name: 'Page One',
-            id: v4(),
-            order: 0,
-            pathName: '',
-            content: documentPageContent,
-            
-          },
-        documentId)
+    if(!useAI){
+        upsertDocumentPage(
+            { 
+                name: 'Page One',
+                id: v4(),
+                order: 0,
+                pathName: '',
+                content: documentPageContent,
+                
+              },
+            documentId)
+    }
+    
     return response
 }
 
@@ -398,6 +402,15 @@ export const upsertDocumentFromTemplate = async (
     }
     
     return response
+}
+
+export const deleteWorkspace = async (workspaceId:string) => {
+    const response = await db.workspace.delete({
+        where: {
+            id: workspaceId
+        }
+    })
+    return response;
 }
 
 export const upsertWorkspace = async (

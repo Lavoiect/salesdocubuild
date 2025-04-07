@@ -3,7 +3,7 @@ import { saveActivityLogsNotification, upsertDocument, upsertWorkspace } from "@
 import { CreateDocumentFormSchema, CreateWorkspaceFormSchema } from "@/lib/types";
 import { useModal } from "@/providers/modal-provider";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { Document } from "@prisma/client";
+import { Workspace } from "@prisma/client";
 import { useRouter } from "next/navigation";
 import React, { useEffect } from "react";
 import { useForm } from "react-hook-form";
@@ -19,7 +19,7 @@ import Loading from "../global/loading";
 
 
 interface CreateWorkspaceProps {
-    defaultData?: Document
+    defaultData?: Workspace
     agencyId:string
 }
 

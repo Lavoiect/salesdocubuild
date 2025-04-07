@@ -38,7 +38,6 @@ interface CreateDocFromTemplateProps {
     agencyId: string
     workspaces: Workspace[]
     content: string
-    documents: any
 }
 
 const CreateDocFromTemplateForm: React.FC<CreateDocFromTemplateProps> = ({
@@ -46,7 +45,6 @@ const CreateDocFromTemplateForm: React.FC<CreateDocFromTemplateProps> = ({
     content,
     workspaces,
     agencyId,
-    documents
 }) => {
     const { setClose } = useModal()
     const router = useRouter()

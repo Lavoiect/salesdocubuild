@@ -7,8 +7,10 @@ import { Sparkle } from "lucide-react"
 
 type Props = {
    workspaceId: string
+   useAi: boolean
+   agencyId: string
 }
-export const CreateDocumentAiBnt = ({ workspaceId }: Props) => {
+export const CreateDocumentAiBnt = ({ workspaceId, useAi, agencyId }: Props) => {
     const {setOpen} = useModal()
 
     const handleCreateDocument = async () => {
@@ -17,7 +19,7 @@ export const CreateDocumentAiBnt = ({ workspaceId }: Props) => {
                 title="Create a Document With AI"
                 subheading="Create a workspace for your documents"
             >
-                <CreateDocumentForm workspaceId={workspaceId}/>
+                <CreateDocumentForm  useAi={useAi} workspaceId={workspaceId}/>
                 
             </CustomModal>
         )

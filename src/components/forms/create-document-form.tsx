@@ -18,16 +18,21 @@ import { Button } from "../ui/button";
 import Loading from "../global/loading";
 import { Textarea } from "../ui/textarea";
 import { set } from "date-fns";
+import AIPrompt from "@/data/promt";
+import PromtForm from "./promt-form";
 
 
 interface CreateDocumentProps {
     defaultData?: Document
     workspaceId:string
+    useAi: boolean,
+   
 }
 
 const CreateDocumentForm: React.FC<CreateDocumentProps> = ({
     defaultData,
-    workspaceId
+    workspaceId,
+    useAi,
 }) => {
     const {setClose} = useModal()
     const router = useRouter()
@@ -44,7 +49,7 @@ const CreateDocumentForm: React.FC<CreateDocumentProps> = ({
     })
     const [showAIPrompt, setShowAIPrompt] = useState(false)
     const [showDocDetails, setDocDetails] = useState(true)
-
+    const [docId, setDocId] = useState<string>()
     
     useEffect(() => {
         if(defaultData){
@@ -59,13 +64,19 @@ const CreateDocumentForm: React.FC<CreateDocumentProps> = ({
 
     const isLoading = form.formState.isLoading
 
+
     const onSubmit = async (values: z.infer<typeof CreateDocumentFormSchema>) => {
         if(!workspaceId) return
+        const documentId = defaultData?.id || v4();
+        setDocId(documentId);
         const res = await upsertDocument(
             workspaceId,
             {...values},
-            defaultData?.id || v4()
+            documentId,
+            undefined,
+            useAi
         )
+        setDocId(documentId)
         await saveActivityLogsNotification({
             agencyId: workspaceId,
             description: `Updated document \ ${res.name}`,
@@ -82,8 +93,8 @@ const CreateDocumentForm: React.FC<CreateDocumentProps> = ({
                 description: 'Could not save document details',
                 variant: 'destructive'
             })
-       // setClose()
-       setDocDetails(false)
+       if(!useAi)setClose()
+         setDocDetails(false)
          setShowAIPrompt(true)
         router.refresh()
     }
@@ -91,7 +102,8 @@ const CreateDocumentForm: React.FC<CreateDocumentProps> = ({
     return (
         <Card className="flex-1">
             <CardHeader>
-                <CardTitle>Document Details</CardTitle>
+                <CardTitle>Document Details  boolean
+               </CardTitle>
             </CardHeader>
             <CardContent>
                 {showDocDetails && (
@@ -167,13 +179,8 @@ const CreateDocumentForm: React.FC<CreateDocumentProps> = ({
                      </form>
                  </Form>
                 )}
-               
-                {showAIPrompt && (
-                     <div>
-                     <p>Enter details of what you want to create with AI.</p>
-                     <Textarea placeholder="Type here"/>
-                     <Button>Generate</Button>
-                 </div>
+                {showAIPrompt && useAi && (
+                     <PromtForm documentId={docId}/>
                 )}
                
             </CardContent>

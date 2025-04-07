@@ -8,8 +8,9 @@ import { useModal } from "@/providers/modal-provider"
 
 type Props = {
    workspaceId: string
+   useAi: boolean
 }
-export const CreateDocumentBnt = ({ workspaceId }: Props) => {
+export const CreateDocumentBnt = ({ workspaceId, useAi }: Props) => {
     const {setOpen} = useModal()
 
     const handleCreateWorkspace = async () => {
@@ -18,7 +19,11 @@ export const CreateDocumentBnt = ({ workspaceId }: Props) => {
                 title="Create a Document"
                 subheading="Create a workspace for your documents"
             >
-                <CreateDocumentForm workspaceId={workspaceId}/>
+               <div>
+               
+                {String(useAi)}
+               </div>
+                <CreateDocumentForm useAi={useAi} workspaceId={workspaceId}/>
             </CustomModal>
         )
     }

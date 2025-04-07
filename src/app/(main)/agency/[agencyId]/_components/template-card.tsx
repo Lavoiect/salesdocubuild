@@ -71,7 +71,7 @@ const TemplateCard = async ({ agencyId, workspace, documents }: Props) => {
                                     <DropdownMenuSubContent>
                                         <DropdownMenuItem>
                                             
-                                            <span><CreateDocumentBnt workspaceId={workspace.id} />
+                                            <span><CreateDocumentBnt workspaceId={workspace.id} useAi={false}/>
                                             </span>
                                         </DropdownMenuItem>
                                         <DropdownMenuItem>

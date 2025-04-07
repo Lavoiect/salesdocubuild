@@ -22,7 +22,7 @@ const DeleteDocumentBtn = (props: Props) => {
                    router.refresh()
    }
   return (
-    <Trash className='text-red-500' onClick={handleDelete(props.documentId)} />
+    <Trash size={20} className='text-red-400' onClick={handleDelete(props.documentId)} />
   )
 }
 

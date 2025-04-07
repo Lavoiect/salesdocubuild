@@ -173,7 +173,8 @@ const editorReducer = (
 
     case 'REFRESH_EDITOR_STATE':
       // Force a state refresh by returning a new reference
-      return { ...state }
+      // Trigger a state refresh by returning a new reference
+      return { ...state, editor: { ...state.editor } };
 
     case 'UPDATE_ELEMENT':
       // Perform your logic to update the element in the state

@@ -82,8 +82,10 @@ const ImageComponent = (props: Props) => {
                     className='!object-scale-down'
                     src={props.element.content.src || '/fallback-image.png'} 
                     alt={'Image'} 
-                    width={typeof props.element.styles.width === 'string' ? parseInt(props.element.styles.width, 10) : props.element.styles.width || 560}
-                    height={typeof props.element.styles.height === 'string' ? parseInt(props.element.styles.height, 10) : props.element.styles.height || 315}
+                    style={{
+                        height: props.element.styles.height || '315px', // Default height if undefined
+                        width: props.element.styles.width || '560px'   // Default width if undefined
+                    }}
                 />
             )}
             
