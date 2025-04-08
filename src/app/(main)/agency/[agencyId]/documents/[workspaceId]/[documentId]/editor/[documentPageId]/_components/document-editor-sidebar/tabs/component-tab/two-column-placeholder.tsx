@@ -1,4 +1,5 @@
 import { EditorBtns } from '@/lib/constants'
+import { Columns2 } from 'lucide-react'
 import React from 'react'
 
 type Props = {}
@@ -12,10 +13,9 @@ const TwoColumnPlaceholder = (props: Props) => {
     <div 
         draggable
         onDragStart={(e) => handleDragStart(e, '2Col')}
-        className='h-14 w-14 bg-muted/70 rounded-lg p-2 flex flex-row gap-[4px]'
+        className='p-2 text-muted-foreground h-10 w-10 bg-gray-100 group-hover:text-primary group-hover:bg-purple-100 rounded-full'
     >
-        <div className='border-dashed border-[1px] h-full rounded-sm bg-muted border-muted-foreground/50 w-full'></div>
-        <div className='border-dashed border-[1px] h-full rounded-sm bg-muted border-muted-foreground/50 w-full'></div>
+       <Columns2 />
     </div>
   )
 }

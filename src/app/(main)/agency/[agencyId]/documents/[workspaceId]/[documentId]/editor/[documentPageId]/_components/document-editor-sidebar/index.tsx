@@ -61,9 +61,10 @@ const FunnelEditorSidebar = ({subaccountId}: Props) => {
                                 <SheetDescription>
                                     You can drag and drop componets on the convas
                                 </SheetDescription>
-                                <ComponentsTab/>
+                                
                                 
                             </SheetHeader>
+                            <ComponentsTab/>
                         </TabsContent>
                     </div>
                 </SheetContent>

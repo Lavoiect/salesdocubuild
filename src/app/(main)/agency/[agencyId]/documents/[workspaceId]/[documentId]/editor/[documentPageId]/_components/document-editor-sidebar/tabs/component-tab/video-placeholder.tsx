@@ -1,5 +1,5 @@
 import { EditorBtns } from '@/lib/constants'
-import { Youtube } from 'lucide-react'
+import { Play, Youtube } from 'lucide-react'
 import React from 'react'
 
 type Props = {}
@@ -13,9 +13,9 @@ const VideoPlaceholder = (props: Props) => {
     <div
     draggable
     onDragStart={(e) => handleDragStart(e, 'video')}
-    className='h-14 w-14 bg-muted rounded-lg flex items-center justify-center'
+    className='p-2 text-muted-foreground h-10 w-10 bg-gray-100 group-hover:text-primary group-hover:bg-purple-100 rounded-full'
     >
-        <Youtube size={40} className='text-muted-foreground'/>
+        <Play />
     </div>
   )
 }

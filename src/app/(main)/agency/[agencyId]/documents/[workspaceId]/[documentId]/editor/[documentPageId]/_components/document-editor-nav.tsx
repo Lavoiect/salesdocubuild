@@ -9,7 +9,7 @@ import { saveActivityLogsNotification, upsertDocumentPage } from "@/lib/queries"
 import { DeviceTypes, useWebEditor } from "@/providers/editor/editor-provider"
 import { DocumentPage } from "@prisma/client"
 import clsx from "clsx"
-import { ArrowLeftCircle, EyeIcon, Laptop, Redo2, Smartphone, Tablet, Undo2 } from "lucide-react"
+import { ArrowLeftCircle, ChevronLeft, EyeIcon, Laptop, Redo2, Smartphone, Tablet, Undo2 } from "lucide-react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { FocusEventHandler, useEffect } from "react"
@@ -112,8 +112,10 @@ const FunnelEditorNav = ({
                 )}
             >
                 <aside className="flex items-center gap-4 max-w-[260px] w-[300px]">
-                    <Link href={`/agency`}>
-                    <ArrowLeftCircle/>
+                    <Link className="border rounded-md p-3 border-slate-300" href={`/agency`}>
+                   <div className="flex items-center gap-2">
+                      <ChevronLeft/> <span className="text-muted-foreground">Back</span>
+                    </div> 
                     </Link>
                     <div className="flex flex-col w-full">
                         <Input 
@@ -136,12 +138,12 @@ const FunnelEditorNav = ({
               })
             }}
           >
-            <TabsList className="grid w-full grid-cols-3 bg-transparent h-fit">
+            <TabsList className="grid w-full grid-cols-3 bg-purple-200 h-fit">
               <Tooltip>
                 <TooltipTrigger>
                   <TabsTrigger
                     value="Desktop"
-                    className="data-[state=active]:bg-muted w-10 h-10 p-0"
+                    className="data-[state=active]:bg-primary data-[state=active]:text-white w-10 h-10 p-0"
                   >
                     <Laptop />
                   </TabsTrigger>
@@ -154,7 +156,7 @@ const FunnelEditorNav = ({
                 <TooltipTrigger>
                   <TabsTrigger
                     value="Tablet"
-                    className="w-10 h-10 p-0 data-[state=active]:bg-muted"
+                    className="w-10 h-10 p-0 data-[state=active]:bg-primary data-[state=active]:text-white"
                   >
                     <Tablet />
                   </TabsTrigger>
@@ -167,7 +169,7 @@ const FunnelEditorNav = ({
                 <TooltipTrigger>
                   <TabsTrigger
                     value="Mobile"
-                    className="w-10 h-10 p-0 data-[state=active]:bg-muted"
+                    className="w-10 h-10 p-0 data-[state=active]:bg-primary data-[state=active]:text-white"
                   >
                     <Smartphone />
                   </TabsTrigger>
@@ -183,7 +185,7 @@ const FunnelEditorNav = ({
           <Button
             variant={'ghost'}
             size={'icon'}
-            className="hover:bg-slate-800"
+            className="hover:bg-primary hover:text-white text-muted-foreground"
             onClick={handlePreviewClick}
           >
             <EyeIcon />
@@ -193,7 +195,7 @@ const FunnelEditorNav = ({
             onClick={handleUndo}
             variant={'ghost'}
             size={'icon'}
-            className="hover:bg-slate-800"
+            className="hover:bg-primary hover:text-white text-muted-foreground"
           >
             <Undo2 />
           </Button>
@@ -204,7 +206,7 @@ const FunnelEditorNav = ({
             onClick={handleRedo}
             variant={'ghost'}
             size={'icon'}
-            className="hover:bg-slate-800 mr-4"
+            className="hover:bg-primary hover:text-white text-muted-foreground mr-4"
           >
             <Redo2 />
           </Button>
@@ -221,7 +223,7 @@ const FunnelEditorNav = ({
               Last updated {documentPageDetails.updatedAt.toLocaleDateString()}
             </span>
           </div>
-          <Button onClick={handleOnSave}>Save</Button>
+          <Button className="hover:bg-purple-400" onClick={handleOnSave}>Save</Button>
         </aside>
 
             </nav>

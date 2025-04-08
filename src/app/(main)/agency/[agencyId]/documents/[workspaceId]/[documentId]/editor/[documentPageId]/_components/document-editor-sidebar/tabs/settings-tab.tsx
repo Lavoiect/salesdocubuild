@@ -22,7 +22,11 @@ import {
   AlignVerticalJustifyStart,
   ChevronsLeftRightIcon,
   Divide,
+  LayoutGrid,
+  Link,
   LucideImageDown,
+  Paintbrush,
+  Ruler,
 } from 'lucide-react'
 import { Tabs, TabsTrigger, TabsList } from '@/components/ui/tabs'
 import {
@@ -97,7 +101,7 @@ const SettingsTab = (props: Props) => {
         className="px-6 py-0  "
       >
          
-        <AccordionTrigger className="!no-underline">Custom</AccordionTrigger>   
+        <AccordionTrigger className="!no-underline"><div className='flex items-center gap-2'><Link size={20} className='text-muted-foreground'/>Link</div></AccordionTrigger>   
         <AccordionContent>
          
              {state.editor.selectedElement.type === 'video' &&
@@ -131,7 +135,7 @@ const SettingsTab = (props: Props) => {
         className=" px-6 py-0 "
       >
         <AccordionTrigger className="!no-underline">
-          Dimensions
+        <div className='flex items-center gap-2'><Ruler size={20} className='text-muted-foreground'/>Dimensions</div>
         </AccordionTrigger>
         <AccordionContent>
           <div className="flex flex-col gap-4">
@@ -140,21 +144,47 @@ const SettingsTab = (props: Props) => {
                 <div className="flex gap-4">
                   <div>
                     <Label className="text-muted-foreground">Height</Label>
+                    <div className='flex items-center'>
                     <Input
                       id="height"
-                      placeholder="px"
-                      onChange={handleOnChanges}
-                      value={state.editor.selectedElement.styles.height}
+                      placeholder="Value"
+                      onChange={(e) => {
+                      handleOnChanges({
+                        target: {
+                        id: 'height',
+                        value: e.target.value.endsWith('px') ? e.target.value : `${e.target.value}px`,
+                        },
+                      })
+                      }}
+                      value={typeof state.editor.selectedElement.styles.height === 'string' 
+                        ? state.editor.selectedElement.styles.height.replace('px', '') 
+                        : state.editor.selectedElement.styles.height}
                     />
+                    <span className='p-2 rounded-md border border-slate-300'>px</span>
+                    </div>
+                    
                   </div>
                   <div>
                     <Label className="text-muted-foreground">Width</Label>
+                    <div className='flex items-center'>
                     <Input
-                      placeholder="px"
+                      placeholder="Value"
                       id="width"
-                      onChange={handleOnChanges}
-                      value={state.editor.selectedElement.styles.width}
+                      onChange={(e) => {
+                        handleOnChanges({
+                          target: {
+                          id: 'width',
+                          value: e.target.value.endsWith('px') ? e.target.value : `${e.target.value}px`,
+                          },
+                        })
+                        }}
+                        value={typeof state.editor.selectedElement.styles.width === 'string' 
+                          ? state.editor.selectedElement.styles.width.replace('px', '') 
+                          : state.editor.selectedElement.styles.width}
                     />
+                    <span className='p-2 rounded-md border border-slate-300'>px</span>
+                    </div>
+                    
                   </div>
                 </div>
               </div>
@@ -255,7 +285,7 @@ const SettingsTab = (props: Props) => {
         className="px-6 py-0 "
       >
         <AccordionTrigger className="!no-underline">
-          Decorations
+        <div className='flex items-center gap-2'><Paintbrush size={20} className='text-muted-foreground'/>Decorations</div>
         </AccordionTrigger>
         <AccordionContent className="flex flex-col gap-4">
           <div>
@@ -450,7 +480,9 @@ const SettingsTab = (props: Props) => {
         value="Flexbox"
         className="px-6 py-0  "
       >
-        <AccordionTrigger className="!no-underline">Flexbox</AccordionTrigger>
+        <AccordionTrigger className="!no-underline">
+        <div className='flex items-center gap-2'><LayoutGrid size={20} className='text-muted-foreground'/>Flexbox</div>
+          </AccordionTrigger>
         <AccordionContent>
           <Label className="text-muted-foreground">Justify Content</Label>
           <Tabs

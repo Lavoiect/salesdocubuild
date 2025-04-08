@@ -1,5 +1,5 @@
 import { EditorBtns } from '@/lib/constants'
-import { TypeIcon } from 'lucide-react'
+import { TextSelect, TypeIcon } from 'lucide-react'
 import React from 'react'
 
 type Props = {}
@@ -15,9 +15,9 @@ const TextPlaceholder = (props: Props) => {
         onDragStart={(e) => {
             handleDragState(e, 'text')
         }}
-        className='h-14 w-14 bg-muted rounded-lg flex items-center justify-center'
+        className='p-2 text-muted-foreground h-10 w-10 bg-gray-100 group-hover:text-primary group-hover:bg-purple-100 rounded-full'
     >
-        <TypeIcon size={40} className='text-muted-foreground' />
+        <TextSelect />
     </div>
   )
 }
