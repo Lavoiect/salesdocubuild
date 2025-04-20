@@ -4,6 +4,7 @@ import Container from "./container"
 import VideoComponent from "./video"
 import LinkComponent from "./link"
 import ImageComponent from "./image"
+import ButtonComponent from "./button"
 
 type Props = {
     element: EditorElement
@@ -30,6 +31,8 @@ const Recursive = ({element, index}: Props) => {
             return <LinkComponent element={element} />
         case 'image':
             return <ImageComponent index={index} element={element} />
+        case 'button':
+            return <ButtonComponent element={element} />
           
         default:
           return null

@@ -41,6 +41,7 @@ import {
 import { useWebEditor } from '@/providers/editor/editor-provider'
 import { Slider } from '@/components/ui/slider'
 
+
 type Props = {}
 
 const SettingsTab = (props: Props) => {
@@ -128,6 +129,18 @@ const SettingsTab = (props: Props) => {
                 />
               </div>
             )}
+            {state.editor.selectedElement.type === 'link' &&
+            !Array.isArray(state.editor.selectedElement.content) && (
+              <div className="flex flex-col gap-2">
+                <p className="text-muted-foreground">Link</p>
+                <Input
+                  id="href"
+                  placeholder="https:domain.example.com/pathname"
+                  onChange={handleChangeCustomValues}
+                  value={state.editor.selectedElement.content.href}
+                />
+              </div>
+            )}
         </AccordionContent>
       </AccordionItem>
       <AccordionItem
@@ -143,10 +156,12 @@ const SettingsTab = (props: Props) => {
               <div className="flex gap-4 flex-col">
                 <div className="flex gap-4">
                   <div>
-                    <Label className="text-muted-foreground">Height</Label>
-                    <div className='flex items-center'>
+                    <Label className="text-muted-foreground text-base">Height</Label>
+                    
+                    <div className='flex rounded-md border border-spacing-1 overflow-clip gap-1 mt-1'>
                     <Input
                       id="height"
+                      className="!border-0 rounded-none !border-r-0"
                       placeholder="Value"
                       onChange={(e) => {
                       handleOnChanges({
@@ -158,16 +173,20 @@ const SettingsTab = (props: Props) => {
                       }}
                       value={typeof state.editor.selectedElement.styles.height === 'string' 
                         ? state.editor.selectedElement.styles.height.replace('px', '') 
-                        : state.editor.selectedElement.styles.height}
+                        : state.editor.selectedElement.styles.height ||
+                        ''}
                     />
-                    <span className='p-2 rounded-md border border-slate-300'>px</span>
+                    <div className='bg-slate-200 p-2 text-muted-foreground'>
+                       px
+                    </div>
                     </div>
                     
                   </div>
                   <div>
-                    <Label className="text-muted-foreground">Width</Label>
-                    <div className='flex items-center'>
+                    <Label className="text-muted-foreground text-base">Width</Label>
+                    <div className='flex rounded-md border border-spacing-1 overflow-clip gap-1 mt-1'>
                     <Input
+                      className="!border-0 rounded-none !border-r-0"
                       placeholder="Value"
                       id="width"
                       onChange={(e) => {
@@ -180,101 +199,263 @@ const SettingsTab = (props: Props) => {
                         }}
                         value={typeof state.editor.selectedElement.styles.width === 'string' 
                           ? state.editor.selectedElement.styles.width.replace('px', '') 
-                          : state.editor.selectedElement.styles.width}
+                          : state.editor.selectedElement.styles.width ||
+                          ''}
                     />
-                    <span className='p-2 rounded-md border border-slate-300'>px</span>
+                   <div className='bg-slate-200 p-2 text-muted-foreground'>
+                       px
+                    </div>
                     </div>
                     
                   </div>
                 </div>
               </div>
-              <p>Margin px</p>
+              <p className='mt-4 text-muted-foreground text-base'>Margin</p>
+              <div className="flex items-center gap-2 mt-4 mb-2">
+            <Input
+              className="h-4 w-4"
+              placeholder="px"
+              type="checkbox"
+              id="margin"
+              onChange={(va) => {
+                handleOnChanges({
+                  target: {
+                    id: 'margin',
+                    value: va.target.checked ? 'auto' : 0,
+                  },
+                })
+              }}
+              checked={
+                state.editor.selectedElement.styles.margin === 'auto'
+              }
+            />
+            <Label className="text-muted-foreground">Center Element</Label>
+          </div>
               <div className="flex gap-4 flex-col">
                 <div className="flex gap-4">
+                
                   <div>
                     <Label className="text-muted-foreground">Top</Label>
+                    <div className='flex rounded-md border border-spacing-1 overflow-clip gap-1 mt-1'>
                     <Input
                       id="marginTop"
-                      placeholder="px"
-                      onChange={handleOnChanges}
-                      value={state.editor.selectedElement.styles.marginTop}
-                    />
+                      className="!border-0 rounded-none !border-r-0"
+                      placeholder="Value"
+                      onChange={(e) => {
+                        handleOnChanges({
+                          target: {
+                          id: 'marginTop',
+                          value: e.target.value.endsWith('px') ? e.target.value : `${e.target.value}px`,
+                          },
+                        })
+                        }}
+                        value={typeof state.editor.selectedElement.styles.marginTop === 'string' 
+                          ? state.editor.selectedElement.styles.marginTop.replace('px', '') 
+                        : state.editor.selectedElement.styles.marginTop ||
+                         ''}
+                        
+                      />
+                     <div className='bg-slate-200 p-2 text-muted-foreground'>
+                       px
+                    </div>
+                    </div>
+                   
                   </div>
                   <div>
                     <Label className="text-muted-foreground">Bottom</Label>
+                    <div className='flex rounded-md border border-spacing-1 overflow-clip gap-1 mt-1'>
                     <Input
-                      placeholder="px"
+                     className="!border-0 rounded-none !border-r-0"
+                      placeholder="Value"
                       id="marginBottom"
-                      onChange={handleOnChanges}
-                      value={state.editor.selectedElement.styles.marginBottom}
+                      onChange={(e) => {
+                        handleOnChanges({
+                          target: {
+                          id: 'marginBottom',
+                          value: e.target.value.endsWith('px') ? e.target.value : `${e.target.value}px`,
+                          },
+                        })
+                        }}
+                        value={typeof state.editor.selectedElement.styles.marginBottom === 'string' 
+                          ? state.editor.selectedElement.styles.marginBottom.replace('px', '') 
+                          : state.editor.selectedElement.styles.marginBottom ||
+                          ''}
                     />
+                    <div className='bg-slate-200 p-2 text-muted-foreground'>
+                       px
+                    </div>
+                    </div>
+                   
                   </div>
                 </div>
                 <div className="flex gap-4">
                   <div>
+                    
                     <Label className="text-muted-foreground">Left</Label>
+                    <div className='flex rounded-md border border-spacing-1 overflow-clip gap-1 mt-1'>
                     <Input
-                      placeholder="px"
+                      className="!border-0 rounded-none !border-r-0"
+
+                      placeholder="Value"
                       id="marginLeft"
-                      onChange={handleOnChanges}
-                      value={state.editor.selectedElement.styles.marginLeft}
+                      onChange={(e) => {
+                        handleOnChanges({
+                          target: {
+                          id: 'marginLeft',
+                          value: e.target.value.endsWith('px') ? e.target.value : `${e.target.value}px`,
+                          },
+                        })
+                        }}
+                        value={typeof state.editor.selectedElement.styles.marginLeft === 'string' 
+                          ? state.editor.selectedElement.styles.marginLeft.replace('px', '') 
+                          : state.editor.selectedElement.styles.marginLeft ||
+                          ''}
                     />
+                     <div className='bg-slate-200 p-2 text-muted-foreground'>
+                       px
+                    </div>
+                    </div>
+                    
                   </div>
                   <div>
                     <Label className="text-muted-foreground">Right</Label>
+                    <div className='flex rounded-md border border-spacing-1 overflow-clip gap-1 mt-1'>
                     <Input
-                      placeholder="px"
+                     className="!border-0 rounded-none !border-r-0"
+                      placeholder="Value"
                       id="marginRight"
-                      onChange={handleOnChanges}
-                      value={state.editor.selectedElement.styles.marginRight}
+                      onChange={(e) => {
+                        handleOnChanges({
+                          target: {
+                          id: 'marginRight',
+                          value: e.target.value.endsWith('px') ? e.target.value : `${e.target.value}px`,
+                          },
+                        })
+                        }}
+                        value={typeof state.editor.selectedElement.styles.marginRight === 'string' 
+                          ? state.editor.selectedElement.styles.marginRight.replace('px', '') 
+                          : state.editor.selectedElement.styles.marginRight ||
+                          ''}
                     />
+                     <div className='bg-slate-200 p-2 text-muted-foreground'>
+                       px
+                    </div>
+                    </div>
+                   
                   </div>
                 </div>
               </div>
             </div>
             <div className="flex flex-col gap-2">
-              <p>Padding px</p>
+              <div className='mt-4 text-muted-foreground text-base'>Padding</div>
               <div className="flex gap-4 flex-col">
                 <div className="flex gap-4">
                   <div>
                     <Label className="text-muted-foreground">Top</Label>
+                    <div className='flex rounded-md border border-spacing-1 overflow-clip gap-1 mt-1'>
                     <Input
+                      className="!border-0 rounded-none !border-r-0"
                       placeholder="px"
                       id="paddingTop"
-                      onChange={handleOnChanges}
-                      value={state.editor.selectedElement.styles.paddingTop}
+                      onChange={(e) => {
+                        handleOnChanges({
+                          target: {
+                          id: 'paddingTop',
+                          value: e.target.value.endsWith('px') ? e.target.value : `${e.target.value}px`,
+                          },
+                        })
+                        }}
+                        value={typeof state.editor.selectedElement.styles.paddingTop === 'string' 
+                          ? state.editor.selectedElement.styles.paddingTop.replace('px', '') 
+                          : state.editor.selectedElement.styles.paddingTop ||
+                          ''}
                     />
+                     <div className='bg-slate-200 p-2 text-muted-foreground'>
+                       px
+                    </div>
+                    </div>
+                    
                   </div>
                   <div>
                     <Label className="text-muted-foreground">Bottom</Label>
+                    <div className='flex rounded-md border border-spacing-1 overflow-clip gap-1 mt-1'>
                     <Input
+                      className="!border-0 rounded-none !border-r-0"
                       placeholder="px"
                       id="paddingBottom"
-                      onChange={handleOnChanges}
-                      value={state.editor.selectedElement.styles.paddingBottom}
+                      onChange={(e) => {
+                        handleOnChanges({
+                          target: {
+                          id: 'paddingBottom',
+                          value: e.target.value.endsWith('px') ? e.target.value : `${e.target.value}px`,
+                          },
+                        })
+                        }}
+                        value={typeof state.editor.selectedElement.styles.paddingBottom === 'string' 
+                          ? state.editor.selectedElement.styles.paddingBottom.replace('px', '') 
+                          : state.editor.selectedElement.styles.paddingBottom ||
+                          ''}
                     />
+                     <div className='bg-slate-200 p-2 text-muted-foreground'>
+                       px
+                    </div>
+                    </div>
                   </div>
                 </div>
                 <div className="flex gap-4">
                   <div>
                     <Label className="text-muted-foreground">Left</Label>
+                    <div className='flex rounded-md border border-spacing-1 overflow-clip gap-1 mt-1'>
                     <Input
-                      placeholder="px"
+                      className="!border-0 rounded-none !border-r-0"
+                      placeholder="Value"
                       id="paddingLeft"
-                      onChange={handleOnChanges}
-                      value={state.editor.selectedElement.styles.paddingLeft}
+                      onChange={(e) => {
+                        handleOnChanges({
+                          target: {
+                          id: 'paddingLeft',
+                          value: e.target.value.endsWith('px') ? e.target.value : `${e.target.value}px`,
+                          },
+                        })
+                        }}
+                        value={typeof state.editor.selectedElement.styles.paddingLeft === 'string' 
+                          ? state.editor.selectedElement.styles.paddingLeft.replace('px', '') 
+                          : state.editor.selectedElement.styles.paddingLeft ||
+                          ''}
                     />
+                     <div className='bg-slate-200 p-2 text-muted-foreground'>
+                       px
+                    </div>
+                  </div>
                   </div>
                   <div>
                     <Label className="text-muted-foreground">Right</Label>
+                    <div className='flex rounded-md border border-spacing-1 overflow-clip gap-1 mt-1'>
                     <Input
-                      placeholder="px"
+                      className="!border-0 rounded-none !border-r-0"
+                      placeholder="Value"
                       id="paddingRight"
-                      onChange={handleOnChanges}
-                      value={state.editor.selectedElement.styles.paddingRight}
+                      onChange={(e) => {
+                        handleOnChanges({
+                          target: {
+                          id: 'paddingRight',
+                          value: e.target.value.endsWith('px') ? e.target.value : `${e.target.value}px`,
+                          },
+                        })
+                        }}
+                        value={typeof state.editor.selectedElement.styles.paddingRight === 'string' 
+                          ? state.editor.selectedElement.styles.paddingRight.replace('px', '') 
+                          : state.editor.selectedElement.styles.paddingRight ||
+                          ''}
                     />
+                     <div className='bg-slate-200 p-2 text-muted-foreground'>
+                       px
+                    </div>
+                    </div>
+                   
+                    </div>
                   </div>
-                </div>
+                
               </div>
             </div>
           </div>
@@ -288,10 +469,50 @@ const SettingsTab = (props: Props) => {
         <div className='flex items-center gap-2'><Paintbrush size={20} className='text-muted-foreground'/>Decorations</div>
         </AccordionTrigger>
         <AccordionContent className="flex flex-col gap-4">
-          <div>
+          <div className='mb-2'>
+
+         
+             
+              
+              {state.editor.selectedElement.type === 'button' &&
+              
+            !Array.isArray(state.editor.selectedElement.content) && (
+              
+              <div className="flex flex-col gap-2">
+                          <div className='mt-4 mb-4 text-muted-foreground text-base'>Button Options</div>
+
+                <p className="text-muted-foreground">Color</p>
+                <Input
+                  id="bgColor"
+                  placeholder="Color"
+                  onChange={handleChangeCustomValues}
+                  value={state.editor.selectedElement.content.bgColor}
+                />
+              </div>
+            )}
+             
+              <div className="flex border-[1px] rounded-md overflow-clip">
+             
+             {state.editor.selectedElement.type === 'button' &&
+            !Array.isArray(state.editor.selectedElement.content) && (
+              <div className="flex flex-col gap-2">
+                <p className="text-muted-foreground">Hover Color</p>
+                <Input
+                  id="hoverColor"
+                  placeholder="Color"
+                  onChange={handleChangeCustomValues}
+                  value={state.editor.selectedElement.content.hoverColor}
+                />
+              </div>
+            )}
+              </div>
+          
+          
+          </div>
+          <div className='mb-2'>
             <Label className="text-muted-foreground">Opacity</Label>
             <div className="flex items-center justify-end">
-              <small className="p-2">
+              <small className="p-1">
                 {typeof state.editor.selectedElement.styles?.opacity ===
                 'number'
                   ? state.editor.selectedElement.styles?.opacity
@@ -312,31 +533,25 @@ const SettingsTab = (props: Props) => {
                   },
                 })
               }}
-              defaultValue={[
-                typeof state.editor.selectedElement.styles?.opacity === 'number'
-                  ? state.editor.selectedElement.styles?.opacity
-                  : parseFloat(
-                      (
-                        state.editor.selectedElement.styles?.opacity || '0'
-                      ).replace('%', '')
-                    ) || 0,
+              value={[
+                typeof state.editor.selectedElement.styles?.opacity === 'string'
+                  ? parseFloat(state.editor.selectedElement.styles?.opacity.replace('%', '')) || 100
+                  : state.editor.selectedElement.styles?.opacity || 100,
               ]}
               max={100}
               step={1}
             />
           </div>
-          <div>
+          <div className='mb-3'>
             <Label className="text-muted-foreground">Border Radius</Label>
             <div className="flex items-center justify-end">
-              <small className="">
+              <small className="p-1">
                 {typeof state.editor.selectedElement.styles?.borderRadius ===
                 'number'
                   ? state.editor.selectedElement.styles?.borderRadius
                   : parseFloat(
-                      (
-                        state.editor.selectedElement.styles?.borderRadius || '0'
-                      ).replace('px', '')
-                    ) || 0}
+                      state.editor.selectedElement.styles?.borderRadius?.replace('px', '') || '0'
+                    )}
                 px
               </small>
             </div>
@@ -345,66 +560,76 @@ const SettingsTab = (props: Props) => {
                 handleOnChanges({
                   target: {
                     id: 'borderRadius',
-                    value: `${e[0]}px`,
+                    value: `${e[0]}%`,
                   },
                 })
               }}
-              defaultValue={[
-                typeof state.editor.selectedElement.styles?.borderRadius ===
-                'number'
-                  ? state.editor.selectedElement.styles?.borderRadius
-                  : parseFloat(
-                      (
-                        state.editor.selectedElement.styles?.borderRadius || '0'
-                      ).replace('%', '')
-                    ) || 0,
+              value={[
+                typeof state.editor.selectedElement.styles?.borderRadius === 'string'
+                  ? parseFloat(state.editor.selectedElement.styles?.borderRadius.replace('%', '')) || 0
+                  : state.editor.selectedElement.styles?.borderRadius || 0,
               ]}
               max={100}
               step={1}
             />
-          </div>
+              </div>
+{/*
           <div className="flex flex-col gap-2">
-            <Label className="text-muted-foreground">Border</Label>
+            <Label className="text-muted-foreground">Border Color</Label> 
             <div className="flex  border-[1px] rounded-md overflow-clip">
               <div
-                className="w-12 "
+                className="w-12"
                 style={{
-                  backgroundColor:
-                    state.editor.selectedElement.styles.backgroundColor,
+                  borderColor:
+                    state.editor.selectedElement.styles.borderColor,
                 }}
               />
               <Input
+              type='color'
                 placeholder="#HFI245"
                 className="!border-y-0 rounded-none !border-r-0 mr-2"
-                id="border"
+                id="borderColor"
+                onChange={handleOnChanges}
+                value={state.editor.selectedElement.styles.borderColor}
+              />
+            </div>
+         
+          </div>
+          
+          <div className="flex flex-col gap-2">
+            <Label className="text-muted-foreground">Border Width</Label> 
+            <div className="flex  border-[1px] rounded-md overflow-clip">
+              
+              <Input
+              
+                placeholder="Value"
+                className="!border-y-0 rounded-none !border-r-0 mr-2"
+                id="borderWidth"
                 onChange={handleOnChanges}
                 value={state.editor.selectedElement.styles.borderWidth}
               />
-              <Input
-                placeholder="#HFI245"
-                className="!border-y-0 rounded-none !border-r-0 mr-2"
-                id="borderStyle"
-                onChange={handleOnChanges}
-                value={state.editor.selectedElement.styles.borderStyle}
-              />
             </div>
+         
           </div>
+          */}
           <div className="flex flex-col gap-2">
             <Label className="text-muted-foreground">Background Color</Label>
             <div className="flex  border-[1px] rounded-md overflow-clip">
               <div
-                className="w-12 "
+                className="w-12"
                 style={{
                   backgroundColor:
                     state.editor.selectedElement.styles.backgroundColor,
                 }}
               />
               <Input
+              type='color'
                 placeholder="#HFI245"
                 className="!border-y-0 rounded-none !border-r-0 mr-2"
                 id="backgroundColor"
                 onChange={handleOnChanges}
-                value={state.editor.selectedElement.styles.backgroundColor}
+                value={state.editor.selectedElement.styles.backgroundColor ||
+                  ''}
               />
             </div>
           </div>
@@ -556,7 +781,7 @@ const SettingsTab = (props: Props) => {
               </TabsTrigger>
             </TabsList>
           </Tabs>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 mt-4 mb-">
             <Input
               className="h-4 w-4"
               placeholder="px"
@@ -573,13 +798,14 @@ const SettingsTab = (props: Props) => {
             />
             <Label className="text-muted-foreground">Flex</Label>
           </div>
-          <div>
+          <div className='mt-4'>
             <Label className="text-muted-foreground"> Direction</Label>
             <Input
-              placeholder="px"
+              placeholder="Value"
               id="flexDirection"
               onChange={handleOnChanges}
-              value={state.editor.selectedElement.styles.flexDirection}
+              value={state.editor.selectedElement.styles.flexDirection ||
+                ''}
             />
           </div>
         </AccordionContent>

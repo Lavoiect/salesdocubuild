@@ -10,6 +10,7 @@ import ContactFormComponentPlaceholder from './contact-form-placeholder'
 import ImagePlaceholder from './image-placeholder'
 import ThreeColumnPlaceholder from './three-column-placeholder'
 import { LayoutDashboard } from 'lucide-react'
+import ButtonPlaceholder from './button-placeholder'
 
 
 type Props = {}
@@ -67,6 +68,12 @@ const ComponentsTab = (props: Props) => {
             Component: <ImagePlaceholder/>,
             id: 'image',
             label: 'Image',
+            group: 'elements'
+        },
+        {
+            Component: <ButtonPlaceholder/>,
+            id: 'button',
+            label: 'Button',
             group: 'elements'
         }
     ]

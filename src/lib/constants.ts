@@ -220,6 +220,7 @@ export const pricingCards = [
   | 'image'
   | null
   | '3Col'
+  | 'button'
 
 
   export const defaultStyles: React.CSSProperties = {

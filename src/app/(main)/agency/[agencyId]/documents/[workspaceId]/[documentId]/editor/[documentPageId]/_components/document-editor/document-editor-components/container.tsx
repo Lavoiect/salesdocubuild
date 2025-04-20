@@ -3,19 +3,10 @@ import { Badge } from '@/components/ui/badge'
 import { EditorBtns, defaultStyles } from '@/lib/constants'
 import { EditorElement, useWebEditor } from '@/providers/editor/editor-provider'
 import clsx from 'clsx'
-import React from 'react'
+import React, { useState } from 'react'
 import { v4 } from 'uuid'
 import Recursive from './recursive'
 import { ArrowDown, ArrowUp, Trash } from 'lucide-react'
-import { stat } from 'fs'
-import { current } from 'tailwindcss/colors'
-
-type EditorAction =
-  | { type: 'ADD_ELEMENT'; payload: { containerId: string; elementDetails: EditorElement } }
-  | { type: 'UPDATE_ELEMENT'; payload: { elementDetails: EditorElement } }
-  | { type: 'DELETE_ELEMENT'; payload: { elementDetails: EditorElement } }
-  | { type: 'CHANGE_CLICKED_ELEMENT'; payload: { elementDetails: EditorElement } }
-  | { type: 'REFRESH_EDITOR_STATE' }; // Add this line
 
 type Props = { element: EditorElement
   index?: number
@@ -25,9 +16,14 @@ const Container = ({ element, index }: Props) => {
   const { id, content, name, styles, type, position } = element
   const { dispatch, state } = useWebEditor()
 
-  
+  const [dragOver, setDragOver] = useState(false)
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    setDragOver(false)
+  }
 
   const handleOnDrop = (e: React.DragEvent, type: string) => {
+    setDragOver(false)
     e.stopPropagation()
     const componentType = e.dataTransfer.getData('componentType') as EditorBtns
 
@@ -203,6 +199,29 @@ const Container = ({ element, index }: Props) => {
           })
           break
 
+          case 'button':
+          dispatch({
+            type: 'ADD_ELEMENT',
+            payload: {
+              containerId: id,
+              elementDetails: {
+                content: {
+                  innerText: 'Click me',
+                  href: '#',
+                  bgColor: '#4F46E5',
+                  hoverColor: '#4338CA',
+                },
+                id: v4(),
+                name: 'Button',
+                styles: {
+                  ...defaultStyles,
+                },
+                type: 'button',
+              },
+            },
+          })
+          break
+
           case 'image':
         dispatch({
           type: 'ADD_ELEMENT',
@@ -225,7 +244,13 @@ const Container = ({ element, index }: Props) => {
   }
 
   const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault()
+    e.preventDefault();
+    e.stopPropagation(); // Prevent event from propagating to parent containers
+
+    
+      setDragOver(true);
+    
+    console.log(e.target);
   }
 
   const handleDragStart = (e: React.DragEvent, type: string) => {
@@ -336,6 +361,7 @@ const Container = ({ element, index }: Props) => {
   return (
     <div
       style={styles}
+      
       className={clsx('relative p-4 transition-all group', {
         'max-w-full w-full': type === 'container' || type === '2Col',
         'h-fit ': type === 'container',
@@ -350,19 +376,22 @@ const Container = ({ element, index }: Props) => {
           state.editor.selectedElement.id === id &&
           !state.editor.liveMode &&
           state.editor.selectedElement.type !== '__body',
-        '!border-yellow-400 !border-4':
+        '!border-primary !border-4':
           state.editor.selectedElement.id === id &&
           !state.editor.liveMode &&
           state.editor.selectedElement.type === '__body',
         '!border-solid':
           state.editor.selectedElement.id === id && !state.editor.liveMode,
         'border-dashed border-[1px] border-slate-300': !state.editor.liveMode,
+        '!bg-purple-100': dragOver
+        
       })}
       onDrop={(e) => handleOnDrop(e, id)}
       onDragOver={handleDragOver}
       draggable={type !== '__body' && !state.editor.liveMode && !state.editor.previewMode}
       onClick={handleOnClickBody}
      onDragStart={(e) => handleDragStart(e, state.editor.selectedElement.type ?? '')}
+     onDragLeave={handleDragLeave}
     >
       <Badge
         className={clsx(
@@ -378,13 +407,16 @@ const Container = ({ element, index }: Props) => {
       </Badge>
 
       {Array.isArray(content) &&
+        content.length > 0 ?
         content.map((childElement, index) => (
           <Recursive
             key={index}
             element={childElement}
             index={index}
           />
-        ))}
+        )): <h2 className='p-2 text-center text-muted-foreground'>Add Content</h2>}
+
+        {}
 
       {state.editor.selectedElement.id === element.id &&
         !state.editor.liveMode &&
