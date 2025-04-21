@@ -787,6 +787,7 @@ const SettingsTab = (props: Props) => {
               placeholder="px"
               type="checkbox"
               id="display"
+              
               onChange={(va) => {
                 handleOnChanges({
                   target: {
@@ -794,7 +795,11 @@ const SettingsTab = (props: Props) => {
                     value: va.target.checked ? 'flex' : 'block',
                   },
                 })
+                
               }}
+              checked={
+                state.editor.selectedElement.styles.display === 'flex'
+              }
             />
             <Label className="text-muted-foreground">Flex</Label>
           </div>
