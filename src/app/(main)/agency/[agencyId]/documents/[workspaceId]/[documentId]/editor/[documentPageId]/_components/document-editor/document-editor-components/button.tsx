@@ -9,14 +9,43 @@ import { Button } from "@/components/ui/button"
 
 type Props = {
   element: EditorElement
+  parentId?: string
 }
 
 const ButtonComponent = (props: Props) => {
   const { dispatch, state } = useWebEditor()
 
-  const handleDragStart = (e: React.DragEvent, type: EditorBtns) => {
-    if (type === null) return
-    e.dataTransfer.setData('componentType', type)
+  
+  const handleDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+
+   
+    const targetId = e.dataTransfer.getData('elementId')
+    const draggedId = props.element.id
+
+    console.log('draggedId:', draggedId)
+    console.log('target:', targetId)
+
+    if (draggedId && draggedId !== targetId) {
+      dispatch({
+        type: 'REODER_ELEMENTS',
+        payload: {
+          sourceElementId: draggedId,
+          targetContainerId: props.parentId ?? 'root',  // Use the parentId here
+        },
+      })
+    }
+
+    e.currentTarget.classList.remove('border-blue-300', 'border-2', 'dashed')
+  }
+
+  const handleDragOver = (e: React.DragEvent) => {
+    e.preventDefault()
+    e.currentTarget.classList.add("border-blue-300", "border-2", "dashed")
+  }
+
+  const handleDragLeave = (e: React.DragEvent) => {
+    e.currentTarget.classList.remove("border-blue-300", "border-2", "dashed")
   }
 
   const handleOnClickBody = (e: React.MouseEvent) => {
@@ -44,7 +73,9 @@ const ButtonComponent = (props: Props) => {
   return (
     <div
       draggable={!state.editor.liveMode}
-      onDragStart={(e) => handleDragStart(e, 'button')}
+      onDragOver={handleDragOver}
+      onDragLeave={handleDragLeave}
+      onDrop={handleDrop}
       onClick={handleOnClickBody}
       className={clsx(
         'p-[2px] w-full m-[5px] relative text-[16px] transition-all',

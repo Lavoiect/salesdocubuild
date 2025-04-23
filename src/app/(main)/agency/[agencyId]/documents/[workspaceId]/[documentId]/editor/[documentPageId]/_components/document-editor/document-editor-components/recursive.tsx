@@ -9,7 +9,8 @@ import ButtonComponent from "./button"
 type Props = {
     element: EditorElement
     index?: number
-    
+    parentId?: string
+
 }
 
 const Recursive = ({element, index}: Props) => {
@@ -32,7 +33,7 @@ const Recursive = ({element, index}: Props) => {
         case 'image':
             return <ImageComponent index={index} element={element} />
         case 'button':
-            return <ButtonComponent element={element} />
+            return <ButtonComponent element={element}  />
           
         default:
           return null

@@ -34,6 +34,9 @@ export type EditorAction =
   | { type: 'LOAD_DATA'; payload: { elements?: EditorElement[]; withLive?: boolean } }
   | { type: 'SET_FUNNELPAGE_ID'; payload: { funnelPageId: string } }
   | { type: 'REFRESH_EDITOR_STATE' }
+  | { type: 'REODER_ELEMENTS'; payload: { sourceElementId: string; targetContainerId: string } }
+
+
 
 export type Editor = {
   liveMode: boolean
@@ -154,6 +157,75 @@ const editorReducer = (
   action: EditorAction
 ): EditorState => {
   switch (action.type) {
+
+    case 'REODER_ELEMENTS': {
+      const {
+        sourceElementId,
+        targetContainerId,
+      } = action.payload
+    
+      const elements = [...state.editor.elements]
+    
+      const findAndRemoveElement = (container: EditorElement): [EditorElement | null, boolean] => {
+        if (!Array.isArray(container.content)) return [null, false]
+    
+        const index = container.content.findIndex((el) => el.id === sourceElementId)
+        if (index !== -1) {
+          const [removed] = container.content.splice(index, 1)
+          return [removed, true]
+        }
+    
+        for (const child of container.content) {
+          const [removed, found] = findAndRemoveElement(child)
+          if (found) return [removed, true]
+        }
+    
+        return [null, false]
+      }
+    
+      const findAndInsertElement = (container: EditorElement, element: EditorElement): boolean => {
+        if (container.id === targetContainerId && Array.isArray(container.content)) {
+          container.content.push(element)
+          return true
+        }
+    
+        if (Array.isArray(container.content)) {
+          for (const child of container.content) {
+            const inserted = findAndInsertElement(child, element)
+            if (inserted) return true
+          }
+        }
+    
+        return false
+      }
+    
+      let removedElement: EditorElement | null = null
+    
+      for (const el of elements) {
+        const [found, wasRemoved] = findAndRemoveElement(el)
+        if (wasRemoved) {
+          removedElement = found
+          break
+        }
+      }
+    
+      if (!removedElement) return state
+    
+      for (const el of elements) {
+        const inserted = findAndInsertElement(el, removedElement)
+        if (inserted) break
+      }
+    
+      return {
+        ...state,
+        editor: {
+          ...state.editor,
+          elements,
+        },
+      }
+    }
+    
+    
     case 'ADD_ELEMENT':
       const updatedEditorState = {
         ...state.editor,
@@ -176,6 +248,10 @@ const editorReducer = (
       }
 
       return newEditorState
+
+      // editor-reducer.ts or editor-provider.ts (your reducer)
+
+
 
     case 'REFRESH_EDITOR_STATE':
       // Force a state refresh by returning a new reference

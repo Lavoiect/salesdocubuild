@@ -4,12 +4,14 @@ import clsx from 'clsx'
 import { Badge } from '@/components/ui/badge'
 import { useWebEditor, EditorElement } from '@/providers/editor/editor-provider'
 import { Trash } from 'lucide-react'
+import Container from './container'
 
 type Props = {
   element: EditorElement
+    parentId?: string
 }
 
-const LinkComponent = ({ element }: Props) => {
+const LinkComponent = ({ element, parentId }: Props) => {
   const { state, dispatch } = useWebEditor()
 
   const isSelected = state.editor.selectedElement.id === element.id
@@ -21,6 +23,30 @@ const LinkComponent = ({ element }: Props) => {
       payload: { elementDetails: element }
     })
   }
+  const handleDrop = (e: React.DragEvent) => {
+      e.preventDefault()
+  
+      
+      const targetId = e.dataTransfer.getData('elementId')
+        const draggedId = element.id
+  
+      console.log('draggedId', draggedId)
+      console.log('target:', targetId)
+
+  
+      if (draggedId && draggedId !== targetId) {
+        dispatch({
+          type: 'REODER_ELEMENTS',
+          payload: {
+            sourceElementId: draggedId,
+            targetContainerId: parentId ?? 'root',  // Use the parentId here
+          },
+        })
+      }
+  
+      e.currentTarget.classList.remove('border-blue-300', 'border-2', 'dashed')
+    }
+  
 
   const handleOnClick = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -34,8 +60,9 @@ const LinkComponent = ({ element }: Props) => {
 
   return (
     <div
-      draggable={!state.editor.liveMode}
+      draggable={false}
       onClick={handleOnClick}
+      onDrop={handleDrop}
       className={clsx(
         'p-[2px] w-full m-[5px] relative transition-all',
         {
@@ -63,7 +90,7 @@ const LinkComponent = ({ element }: Props) => {
         </Link>
       )}
 
-      {/* Edit Mode */}
+      
       {!state.editor.previewMode && !state.editor.liveMode && (
         <span
           contentEditable

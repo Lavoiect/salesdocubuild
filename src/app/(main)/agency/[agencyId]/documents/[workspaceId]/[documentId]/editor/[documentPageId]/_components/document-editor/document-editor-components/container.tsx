@@ -1,4 +1,5 @@
 'use client'
+
 import { Badge } from '@/components/ui/badge'
 import { EditorBtns, defaultStyles } from '@/lib/constants'
 import { EditorElement, useWebEditor } from '@/providers/editor/editor-provider'
@@ -7,370 +8,279 @@ import React, { useState } from 'react'
 import { v4 } from 'uuid'
 import Recursive from './recursive'
 import { ArrowDown, ArrowUp, Trash } from 'lucide-react'
+import { findParentContainerId } from '@/lib/utils' // adjust this path
 
-type Props = { element: EditorElement
+type Props = {
+  element: EditorElement
   index?: number
- }
+}
 
 const Container = ({ element, index }: Props) => {
-  const { id, content, name, styles, type, position } = element
+  const { id, content, name, styles, type } = element
   const { dispatch, state } = useWebEditor()
-
   const [dragOver, setDragOver] = useState(false)
 
-  const handleDragLeave = (e: React.DragEvent) => {
-    setDragOver(false)
-  }
+  const handleDragLeave = () => setDragOver(false)
 
-  const handleOnDrop = (e: React.DragEvent, type: string) => {
-    setDragOver(false)
+  const handleOnDrop = (e: React.DragEvent) => {
+    e.preventDefault()
     e.stopPropagation()
+    setDragOver(false)
+
+    const dragType = e.dataTransfer.getData('dragType')
+
+    if (dragType === 'REORDER') {
+      const draggedElementId = e.dataTransfer.getData('elementId')
+      const sourceContainerId = e.dataTransfer.getData('sourceContainerId')
+
+      dispatch({
+        type: 'REODER_ELEMENTS',
+        payload: {
+          sourceElementId: draggedElementId,
+          targetContainerId: id,
+        },
+      })
+      return
+    }
+
     const componentType = e.dataTransfer.getData('componentType') as EditorBtns
+
+    const basePayload = {
+      containerId: id,
+      elementDetails: {
+        id: v4(),
+        styles: { ...defaultStyles },
+      },
+    }
 
     switch (componentType) {
       case 'text':
         dispatch({
           type: 'ADD_ELEMENT',
           payload: {
-            containerId: id,
+            ...basePayload,
             elementDetails: {
-              content: { innerText: 'Text Element' },
-              id: v4(),
+              ...basePayload.elementDetails,
               name: 'Text',
-              styles: {
-                color: 'black',
-                ...defaultStyles,
-              },
               type: 'text',
+              content: { innerText: 'Text Element' },
+              styles: { ...defaultStyles, color: 'black' },
             },
           },
         })
-      break
-
+        break
       case 'link':
         dispatch({
           type: 'ADD_ELEMENT',
           payload: {
-            containerId: id,
+            ...basePayload,
             elementDetails: {
-              content: { innerText: 'Link Element', href: '#' },
-              id: v4(),
+              ...basePayload.elementDetails,
               name: 'Link',
-              styles: {
-                color: 'black',
-                ...defaultStyles,
-              },
               type: 'link',
+              content: { innerText: 'Link Element', href: '#' },
+              styles: { ...defaultStyles, color: 'black' },
             },
           },
         })
-      break
-       
+        break
+      case 'button':
+        dispatch({
+          type: 'ADD_ELEMENT',
+          payload: {
+            ...basePayload,
+            elementDetails: {
+              ...basePayload.elementDetails,
+              name: 'Button',
+              type: 'button',
+              content: {
+                innerText: 'Click me',
+                href: '#',
+                bgColor: '#4F46E5',
+                hoverColor: '#4338CA',
+              },
+            },
+          },
+        })
+        break
       case 'container':
         dispatch({
           type: 'ADD_ELEMENT',
           payload: {
-            containerId: id,
+            ...basePayload,
             elementDetails: {
-              content: [],
-              id: v4(),
+              ...basePayload.elementDetails,
               name: 'Container',
-              styles: { ...defaultStyles },
               type: 'container',
+              content: [],
             },
           },
         })
         break
-
-        case '2Col':
+      case '2Col':
         dispatch({
           type: 'ADD_ELEMENT',
           payload: {
-            containerId: id,
+            ...basePayload,
             elementDetails: {
-              content: [
-                {
-                  content: [],
-                  id: v4(),
-                  name: 'Container',
-                  styles: { ...defaultStyles, width: '100%' },
-                  type: 'container',
-                },
-                {
-                  content: [],
-                  id: v4(),
-                  name: 'Container',
-                  styles: { ...defaultStyles, width: '100%' },
-                  type: 'container',
-                },
-              ],
-              id: v4(),
+              ...basePayload.elementDetails,
               name: 'Two Columns',
-              styles: { ...defaultStyles, display: 'flex' },
               type: '2Col',
-            },
-          },
-        })
-        break
-        case '3Col':
-        dispatch({
-          type: 'ADD_ELEMENT',
-          payload: {
-            containerId: id,
-            elementDetails: {
               content: [
-                {
-                  content: [],
-                  id: v4(),
-                  name: 'Container',
-                  styles: { ...defaultStyles, width: '100%' },
-                  type: 'container',
-                },
-                {
-                  content: [],
-                  id: v4(),
-                  name: 'Container',
-                  styles: { ...defaultStyles, width: '100%' },
-                  type: 'container',
-                },
-                {
-                  content: [],
-                  id: v4(),
-                  name: 'Container',
-                  styles: { ...defaultStyles, width: '100%' },
-                  type: 'container',
-                },
+                { ...basePayload.elementDetails, id: v4(), type: 'container', name: 'Column 1', content: [], styles: { ...defaultStyles, width: '100%' } },
+                { ...basePayload.elementDetails, id: v4(), type: 'container', name: 'Column 2', content: [], styles: { ...defaultStyles, width: '100%' } },
               ],
-              id: v4(),
-              name: 'Three Columns',
               styles: { ...defaultStyles, display: 'flex' },
+            },
+          },
+        })
+        break
+      case '3Col':
+        dispatch({
+          type: 'ADD_ELEMENT',
+          payload: {
+            ...basePayload,
+            elementDetails: {
+              ...basePayload.elementDetails,
+              name: 'Three Columns',
               type: '3Col',
+              content: new Array(3).fill(null).map((_, i) => ({
+                id: v4(),
+                name: `Column ${i + 1}`,
+                type: 'container',
+                content: [],
+                styles: { ...defaultStyles, width: '100%' },
+              })),
+              styles: { ...defaultStyles, display: 'flex' },
             },
           },
         })
         break
-
-          dispatch({
-            type: 'ADD_ELEMENT',
-            payload: {
-              containerId: id,
-              elementDetails: {
-                content: [],
-                id: v4(),
-                name: 'Contact Form',
-                styles: { ...defaultStyles },
-                type: 'contactForm',
-              },
-            },
-          })
-          break
-      
-        case 'video':
+      case 'contactForm':
         dispatch({
           type: 'ADD_ELEMENT',
           payload: {
-            containerId: id,
+            ...basePayload,
             elementDetails: {
-              content: {
-                src: 'https://www.youtube.com/watch?v=uhUht6vAsMY'
-              },
-              id: v4(),
+              ...basePayload.elementDetails,
+              name: 'Contact Form',
+              type: 'contactForm',
+              content: [],
+            },
+          },
+        })
+        break
+      case 'video':
+        dispatch({
+          type: 'ADD_ELEMENT',
+          payload: {
+            ...basePayload,
+            elementDetails: {
+              ...basePayload.elementDetails,
               name: 'Video',
-              styles: {},
               type: 'video',
+              content: {
+                src: 'https://www.youtube.com/watch?v=uhUht6vAsMY',
+              },
             },
           },
         })
         break
-
-        case 'contactForm':
-          dispatch({
-            type: 'ADD_ELEMENT',
-            payload: {
-              containerId: id,
-              elementDetails: {
-                content: [],
-                id: v4(),
-                name: 'Contact Form',
-                styles: {},
-                type: 'contactForm',
-              },
-            },
-          })
-          break
-
-          case 'button':
-          dispatch({
-            type: 'ADD_ELEMENT',
-            payload: {
-              containerId: id,
-              elementDetails: {
-                content: {
-                  innerText: 'Click me',
-                  href: '#',
-                  bgColor: '#4F46E5',
-                  hoverColor: '#4338CA',
-                },
-                id: v4(),
-                name: 'Button',
-                styles: {
-                  ...defaultStyles,
-                },
-                type: 'button',
-              },
-            },
-          })
-          break
-
-          case 'image':
+      case 'image':
         dispatch({
           type: 'ADD_ELEMENT',
           payload: {
-            containerId: id,
+            ...basePayload,
             elementDetails: {
+              ...basePayload.elementDetails,
+              name: 'Image',
+              type: 'image',
               content: {
                 src: '/_next/image?url=https%3A%2F%2Futfs.io%2Ff%2F23a72a29-5791-4e97-9608-08f4f46e367b-jmarfk.png&w=3840&q=75"',
               },
-              id: v4(),
-              name: 'Image',
-              styles: {},
-              type: 'image',
             },
           },
         })
-      
-     
+        break
     }
   }
 
   const handleDragOver = (e: React.DragEvent) => {
-    e.preventDefault();
-    e.stopPropagation(); // Prevent event from propagating to parent containers
-
-    
-      setDragOver(true);
-    
-    console.log(e.target);
+    e.preventDefault()
+    e.stopPropagation()
+    setDragOver(true)
   }
 
-  const handleDragStart = (e: React.DragEvent, type: string) => {
+  const handleDragStart = (e: React.DragEvent) => {
     if (type === '__body') return
-    e.dataTransfer.setData('componentType', type)
+    e.stopPropagation()
+
+    const sourceContainerId = findParentContainerId(state.editor.elements, id)
+
+    e.dataTransfer.setData('dragType', 'REORDER')
+    e.dataTransfer.setData('elementId', id)
+    e.dataTransfer.setData('sourceContainerId', sourceContainerId ?? '')
   }
 
   const handleOnClickBody = (e: React.MouseEvent) => {
     e.stopPropagation()
     dispatch({
       type: 'CHANGE_CLICKED_ELEMENT',
-      payload: {
-        elementDetails: element,
-      },
+      payload: { elementDetails: element },
     })
   }
 
   const handleDeleteElement = () => {
     dispatch({
       type: 'DELETE_ELEMENT',
-      payload: {
-        elementDetails: element,
-      },
+      payload: { elementDetails: element },
     })
   }
 
-  const moveItemDown = () => {
-    const parentElement = state.editor.elements.find((item) =>
-      Array.isArray(item.content) &&
-      item.content.some((i) => i.id === element.id)
-    );
+  const moveItem = (direction: 'up' | 'down') => {
+    const parent = state.editor.elements.find(
+      (el) =>
+        Array.isArray(el.content) && el.content.some((child) => child.id === id)
+    )
 
-   // console.log(parentElement)
+    if (!parent || !Array.isArray(parent.content)) return
 
-    if (parentElement && Array.isArray(parentElement.content)) {
-      const index = parentElement.content.findIndex(
-        (i) => i.id === element.id
-      );
+    const currentIndex = parent.content.findIndex((child) => child.id === id)
+    const newIndex = direction === 'up' ? currentIndex - 1 : currentIndex + 1
 
-      if (index >= 0 && index < parentElement.content.length - 1) {
-        const newContent = [...parentElement.content];
+    if (newIndex < 0 || newIndex >= parent.content.length) return
 
-        [newContent[index], newContent[index + 1]] = [
-          newContent[index + 1],
-          newContent[index],
-        ];
-      // console.log(newContent)
-        dispatch({
-          type: 'UPDATE_ELEMENT',
-          payload: {
-            elementDetails: {
-              ...parentElement,
-              content: newContent, // Ensure a new reference for state refresh
-            },
-          },
-        });
+    const newContent = [...parent.content]
+    ;[newContent[currentIndex], newContent[newIndex]] = [
+      newContent[newIndex],
+      newContent[currentIndex],
+    ]
 
-        dispatch({
-          type: 'REFRESH_EDITOR_STATE', // Optional: Trigger a state refresh if needed
-        });
-       
-      }
-    }
-    
-    
-  }
-  const moveItemUp = () => {
-    const parentElement = state.editor.elements.find((item) =>
-      Array.isArray(item.content) &&
-      item.content.some((i) => i.id === element.id)
-    );
+    dispatch({
+      type: 'UPDATE_ELEMENT',
+      payload: {
+        elementDetails: {
+          ...parent,
+          content: newContent,
+        },
+      },
+    })
 
-   // console.log(parentElement)
-
-    if (parentElement && Array.isArray(parentElement.content)) {
-      const index = parentElement.content.findIndex(
-        (i) => i.id === element.id
-      );
-
-      if (index > 0) {
-        const newContent = [...parentElement.content];
-
-        [newContent[index], newContent[index - 1]] = [
-          newContent[index - 1],
-          newContent[index],
-        ];
-      // console.log(newContent)
-        dispatch({
-          type: 'UPDATE_ELEMENT',
-          payload: {
-            elementDetails: {
-              ...parentElement,
-              content: newContent, // Ensure a new reference for state refresh
-            },
-          },
-        });
-
-        dispatch({
-          type: 'REFRESH_EDITOR_STATE', // Optional: Trigger a state refresh if needed
-        });
-       
-      }
-    }
-    
-    
+    dispatch({ type: 'REFRESH_EDITOR_STATE' })
   }
 
   return (
     <div
       style={styles}
-      
       className={clsx('relative p-4 transition-all group', {
-        'max-w-full w-full': type === 'container' || type === '2Col',
-        'h-fit ': type === 'container',
-        'h-full': type === '__body',
-        'overflow-scroll ': type === '__body',
-        'flex flex-col md:!flex-row': type === '2Col',
-        'flex flex-col lg:!flex-row': type === '3Col',
+        'max-w-full w-full': ['container', '2Col', '3Col'],
+        'h-fit': type === 'container',
+        'h-full overflow-scroll': type === '__body',
+        'flex flex-col md:flex-row': type === '2Col',
+        'flex flex-col lg:flex-row': type === '3Col',
         '!object-scale-down': type === 'image',
-        '!block': (state.editor.device === 'Mobile' && (type === '2Col' || type === '3Col')) ||
+        '!block':
+          (state.editor.device === 'Mobile' && ['2Col', '3Col']) ||
           (state.editor.device === 'Tablet' && type === '3Col'),
         '!border-blue-500':
           state.editor.selectedElement.id === id &&
@@ -383,57 +293,44 @@ const Container = ({ element, index }: Props) => {
         '!border-solid':
           state.editor.selectedElement.id === id && !state.editor.liveMode,
         'border-dashed border-[1px] border-slate-300': !state.editor.liveMode,
-        '!bg-purple-100': dragOver
-        
+        '!bg-purple-100': dragOver,
       })}
-      onDrop={(e) => handleOnDrop(e, id)}
+      onDrop={handleOnDrop}
       onDragOver={handleDragOver}
-      draggable={type !== '__body' && !state.editor.liveMode && !state.editor.previewMode}
       onClick={handleOnClickBody}
-     onDragStart={(e) => handleDragStart(e, state.editor.selectedElement.type ?? '')}
-     onDragLeave={handleDragLeave}
+      onDragLeave={handleDragLeave}
+      draggable={
+        type !== '__body' && !state.editor.liveMode && !state.editor.previewMode
+      }
+      onDragStart={handleDragStart}
     >
       <Badge
         className={clsx(
           'absolute -top-[23px] -left-[1px] rounded-none rounded-t-lg hidden',
           {
             block:
-              state.editor.selectedElement.id === element.id &&
-              !state.editor.liveMode,
+              state.editor.selectedElement.id === id && !state.editor.liveMode,
           }
         )}
       >
-        {element.name}
+        {name}
       </Badge>
 
-      {Array.isArray(content) &&
-        content.length > 0 ?
-        content.map((childElement, index) => (
-          <Recursive
-            key={index}
-            element={childElement}
-            index={index}
-          />
-        )): <h2 className='p-2 text-center text-muted-foreground'>Add Content</h2>}
+      {Array.isArray(content) && content.length > 0 ? (
+        content.map((child, i) => (
+          <Recursive key={child.id} element={child} index={i} />
+        ))
+      ) : (
+        <h2 className="p-2 text-center text-muted-foreground">Add Content</h2>
+      )}
 
-        {}
-
-      {state.editor.selectedElement.id === element.id &&
+      {state.editor.selectedElement.id === id &&
         !state.editor.liveMode &&
-        state.editor.selectedElement.type !== '__body' && (
-          <div className="absolute bg-primary px-2.5 py-1 text-xs font-bold  -top-[25px] -right-[1px] rounded-none rounded-t-lg ">
-            <Trash
-              size={16}
-              onClick={handleDeleteElement}
-            />
-             <ArrowUp
-              size={16}
-              onClick={moveItemUp}
-            />
-            <ArrowDown
-              size={16}
-              onClick={moveItemDown}
-            />
+        type !== '__body' && (
+          <div className="absolute bg-primary px-2.5 py-1 text-xs font-bold  -top-[25px] -right-[1px] rounded-none rounded-t-lg flex gap-1 items-center">
+            <Trash size={16} onClick={handleDeleteElement} />
+            <ArrowUp size={16} onClick={() => moveItem('up')} />
+            <ArrowDown size={16} onClick={() => moveItem('down')} />
           </div>
         )}
     </div>
