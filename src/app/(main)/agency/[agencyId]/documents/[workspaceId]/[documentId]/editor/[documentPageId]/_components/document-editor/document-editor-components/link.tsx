@@ -5,6 +5,7 @@ import { Badge } from '@/components/ui/badge'
 import { useWebEditor, EditorElement } from '@/providers/editor/editor-provider'
 import { Trash } from 'lucide-react'
 import Container from './container'
+import { findParentContainerId } from '@/lib/utils'
 
 type Props = {
   element: EditorElement
@@ -23,30 +24,15 @@ const LinkComponent = ({ element, parentId }: Props) => {
       payload: { elementDetails: element }
     })
   }
-  const handleDrop = (e: React.DragEvent) => {
-      e.preventDefault()
   
-      
-      const targetId = e.dataTransfer.getData('elementId')
-        const draggedId = element.id
-  
-      console.log('draggedId', draggedId)
-      console.log('target:', targetId)
-
-  
-      if (draggedId && draggedId !== targetId) {
-        dispatch({
-          type: 'REODER_ELEMENTS',
-          payload: {
-            sourceElementId: draggedId,
-            targetContainerId: parentId ?? 'root',  // Use the parentId here
-          },
-        })
-      }
-  
-      e.currentTarget.classList.remove('border-blue-300', 'border-2', 'dashed')
-    }
-  
+  const handleDragStart = (e: React.DragEvent) => {
+    e.stopPropagation()
+    e.dataTransfer.setData('dragType', 'REORDER')
+    e.dataTransfer.setData('elementId', element.id)
+    
+    //const parentId = findParentContainerId(state.editor.elements, element.id)
+    e.dataTransfer.setData('sourceContainerId', parentId || '')
+  }
 
   const handleOnClick = (e: React.MouseEvent) => {
     e.stopPropagation()
@@ -60,9 +46,9 @@ const LinkComponent = ({ element, parentId }: Props) => {
 
   return (
     <div
-      draggable={false}
+      draggable={true}
       onClick={handleOnClick}
-      onDrop={handleDrop}
+      onDragStart={handleDragStart}
       className={clsx(
         'p-[2px] w-full m-[5px] relative transition-all',
         {

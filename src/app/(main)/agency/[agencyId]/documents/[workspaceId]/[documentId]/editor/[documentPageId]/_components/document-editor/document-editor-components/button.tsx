@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button"
 type Props = {
   element: EditorElement
   parentId?: string
+  index?: number
 }
 
 const ButtonComponent = (props: Props) => {
@@ -28,10 +29,12 @@ const ButtonComponent = (props: Props) => {
 
     if (draggedId && draggedId !== targetId) {
       dispatch({
-        type: 'REODER_ELEMENTS',
+        type: 'REORDER_ELEMENTS',
         payload: {
           sourceElementId: draggedId,
-          targetContainerId: props.parentId ?? 'root',  // Use the parentId here
+          targetContainerId: props.parentId ?? 'root',  
+          targetIndex: props.index ?? 0, // 🔥 Pass the index where it was dropped
+
         },
       })
     }
@@ -75,7 +78,9 @@ const ButtonComponent = (props: Props) => {
       draggable={!state.editor.liveMode}
       onDragOver={handleDragOver}
       onDragLeave={handleDragLeave}
-      onDrop={handleDrop}
+      onDragStart={(e) => {
+        e.dataTransfer.setData("text/plain",props.element.id)
+      }}
       onClick={handleOnClickBody}
       className={clsx(
         'p-[2px] w-full m-[5px] relative text-[16px] transition-all',

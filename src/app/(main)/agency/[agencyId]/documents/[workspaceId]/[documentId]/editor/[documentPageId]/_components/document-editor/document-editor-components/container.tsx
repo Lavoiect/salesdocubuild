@@ -13,31 +13,36 @@ import { findParentContainerId } from '@/lib/utils' // adjust this path
 type Props = {
   element: EditorElement
   index?: number
+  parentId?: string
 }
 
-const Container = ({ element, index }: Props) => {
+const Container = ({ element, index, parentId }: Props) => {
   const { id, content, name, styles, type } = element
   const { dispatch, state } = useWebEditor()
   const [dragOver, setDragOver] = useState(false)
 
   const handleDragLeave = () => setDragOver(false)
 
-  const handleOnDrop = (e: React.DragEvent) => {
+  const allowDrop = (e: React.DragEvent) => {
+    e.preventDefault()
+  }
+
+  const handleOnDrop = (e: React.DragEvent, targetIndex: number) => {
     e.preventDefault()
     e.stopPropagation()
     setDragOver(false)
 
+
     const dragType = e.dataTransfer.getData('dragType')
-
-    if (dragType === 'REORDER') {
-      const draggedElementId = e.dataTransfer.getData('elementId')
-      const sourceContainerId = e.dataTransfer.getData('sourceContainerId')
-
+    const draggedElementId = e.dataTransfer.getData('elementId')
+    
+    if (dragType === 'REORDER' && draggedElementId) {
       dispatch({
-        type: 'REODER_ELEMENTS',
+        type: 'REORDER_ELEMENTS',
         payload: {
           sourceElementId: draggedElementId,
           targetContainerId: id,
+          targetIndex // Start with 0 or calculate based on drop zone
         },
       })
       return
@@ -94,6 +99,7 @@ const Container = ({ element, index }: Props) => {
               name: 'Button',
               type: 'button',
               content: {
+
                 innerText: 'Click me',
                 href: '#',
                 bgColor: '#4F46E5',
@@ -151,7 +157,7 @@ const Container = ({ element, index }: Props) => {
                 content: [],
                 styles: { ...defaultStyles, width: '100%' },
               })),
-              styles: { ...defaultStyles, display: 'flex' },
+              styles: { ...defaultStyles, display: 'flex-1' },
             },
           },
         })
@@ -295,7 +301,7 @@ const Container = ({ element, index }: Props) => {
         'border-dashed border-[1px] border-slate-300': !state.editor.liveMode,
         '!bg-purple-100': dragOver,
       })}
-      onDrop={handleOnDrop}
+      onDrop={(e) => handleOnDrop(e, 0)}
       onDragOver={handleDragOver}
       onClick={handleOnClickBody}
       onDragLeave={handleDragLeave}
@@ -318,7 +324,10 @@ const Container = ({ element, index }: Props) => {
 
       {Array.isArray(content) && content.length > 0 ? (
         content.map((child, i) => (
-          <Recursive key={child.id} element={child} index={i} />
+          <div key={`dropzone-${i}`} onDragOver={allowDrop} onDrop={(e) => handleOnDrop(e, i)}>
+              <Recursive element={child} index={index} parentId={element.id} />
+          </div>
+
         ))
       ) : (
         <h2 className="p-2 text-center text-muted-foreground">Add Content</h2>
@@ -333,7 +342,10 @@ const Container = ({ element, index }: Props) => {
             <ArrowDown size={16} onClick={() => moveItem('down')} />
           </div>
         )}
+        <div onDragOver={allowDrop} onDrop={(e) => handleOnDrop(e, Array.isArray(content) ? content.length : 0)} />
+
     </div>
+    
   )
 }
 

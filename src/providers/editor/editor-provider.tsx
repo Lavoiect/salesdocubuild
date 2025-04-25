@@ -34,7 +34,7 @@ export type EditorAction =
   | { type: 'LOAD_DATA'; payload: { elements?: EditorElement[]; withLive?: boolean } }
   | { type: 'SET_FUNNELPAGE_ID'; payload: { funnelPageId: string } }
   | { type: 'REFRESH_EDITOR_STATE' }
-  | { type: 'REODER_ELEMENTS'; payload: { sourceElementId: string; targetContainerId: string } }
+  | { type: 'REORDER_ELEMENTS'; payload: { sourceElementId: string; targetContainerId: string; targetIndex: number } }
 
 
 
@@ -158,11 +158,8 @@ const editorReducer = (
 ): EditorState => {
   switch (action.type) {
 
-    case 'REODER_ELEMENTS': {
-      const {
-        sourceElementId,
-        targetContainerId,
-      } = action.payload
+    case 'REORDER_ELEMENTS': {
+      const { sourceElementId, targetContainerId, targetIndex } = action.payload
     
       const elements = [...state.editor.elements]
     
@@ -183,21 +180,31 @@ const editorReducer = (
         return [null, false]
       }
     
-      const findAndInsertElement = (container: EditorElement, element: EditorElement): boolean => {
+      const findAndInsertElement = (
+        container: EditorElement,
+        element: EditorElement,
+        index: number | undefined
+      ): boolean => {
         if (container.id === targetContainerId && Array.isArray(container.content)) {
-          container.content.push(element)
+          if (typeof index === 'number') {
+            container.content.splice(index, 0, element)
+          } else {
+            container.content.push(element)
+          }
           return true
         }
     
         if (Array.isArray(container.content)) {
           for (const child of container.content) {
-            const inserted = findAndInsertElement(child, element)
+            const inserted = findAndInsertElement(child, element, index)
             if (inserted) return true
           }
         }
-    
+      
         return false
       }
+    
+      
     
       let removedElement: EditorElement | null = null
     
@@ -212,7 +219,7 @@ const editorReducer = (
       if (!removedElement) return state
     
       for (const el of elements) {
-        const inserted = findAndInsertElement(el, removedElement)
+        const inserted = findAndInsertElement(el, removedElement, targetIndex)
         if (inserted) break
       }
     
@@ -224,6 +231,7 @@ const editorReducer = (
         },
       }
     }
+    
     
     
     case 'ADD_ELEMENT':
