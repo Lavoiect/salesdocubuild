@@ -14,6 +14,7 @@ import Link from "next/link"
 import { useRouter } from "next/navigation"
 import { FocusEventHandler, useEffect } from "react"
 import { toast } from "sonner"
+import ExportButton from "./export-pdf-btn"
 
 type Props = {
     documentId: string

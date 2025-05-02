@@ -9,6 +9,7 @@ import { CreateDocumentFormSchema, CreateMediaType, CreateWorkspaceFormSchema, U
 import { z } from "zod";
 
 import { revalidatePath } from "next/cache";
+import { id } from "date-fns/locale";
 
 
 export const getAuthUserDetails =async () => {
@@ -342,12 +343,15 @@ export const upsertDocument = async (
     documentPageContent?: string,
     useAI?: boolean
 ) => {
+
+    const docId = documentId || v4()
     const response = await db.document.upsert({
         where: {id: documentId},
         update: document,
         create: {
             ...document,
-            id: documentId || v4(),
+            id: docId,
+            subDomainName: docId, // Generate a unique string for subDomainName
             workspaceId: workspaceId
         }
     })

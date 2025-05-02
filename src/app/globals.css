@@ -127,3 +127,31 @@ B (255 */
   height: 0;
   pointer-events: none;
 }
+
+
+/* Hide editor-only elements in liveMode-style export */
+.liveMode [data-editor-only],
+.liveMode .editor-label,
+.liveMode .delete-button,
+.liveMode .drag-handle,
+.liveMode .border-outline,
+.liveMode .badge,
+.liveMode .editor-toolbar {
+  display: none !important;
+}
+
+/* Optional: Remove dashed borders or override outlines */
+.liveMode .border-dashed,
+.liveMode .border-solid,
+.liveMode .border-blue-500,
+.liveMode .border-primary {
+  border: none !important;
+}
+
+/* Optional: Reset background highlights */
+.liveMode .bg-purple-100,
+.liveMode .bg-primary {
+  background-color: transparent !important;
+}
+
+

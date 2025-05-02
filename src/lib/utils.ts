@@ -2,6 +2,10 @@ import { EditorElement } from "@/providers/editor/editor-provider";
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
+import html2canvas from 'html2canvas'
+import jsPDF from 'jspdf'
+
+
 export function cn(...inputs: ClassValue[]) {
   return twMerge(clsx(inputs))
 }
@@ -23,4 +27,9 @@ export const findParentContainerId = (
 
   return null;
 };
+
+
+// utils/exportToPdf.ts
+
+
 

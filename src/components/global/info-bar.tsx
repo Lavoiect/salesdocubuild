@@ -40,13 +40,13 @@ const InfoBar = ({notifications,agencyId, className, role}: Props) => {
         
             <div
                 className={twMerge(
-                    'fixed z-[20] left-0 right-0 top-0 p-4 bg-white backdrop-blur-md gap-4 items-center border-b-[1px]',
+                    'fixed z-[20] left-0 right-0 top-0 p-2 pl-2 bg-white backdrop-blur-md gap-4 items-center border-b-[1px]',
                     className
                 )}
             >
                 <div className="flex items-center justify-between gap-2">
                     <div>
-                        <Image alt="logo" src='/logo.svg' width="80" height="60"/>
+                        <Image className="text-primary" alt="logo" src='/logo3.svg' width="190" height="60"/>
                     </div>
                         <div className="flex gap-3 items-center">
                             <UserButton afterSignOutUrl="/"/>

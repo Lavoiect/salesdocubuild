@@ -1,7 +1,6 @@
 import { db } from "@/lib/db";
 import { getDomainContent } from "@/lib/queries";
 import EditorProvider from "@/providers/editor/editor-provider";
-import { Edit } from "lucide-react";
 import { notFound } from "next/navigation";
 import FunnelEditor from "../(main)/agency/[agencyId]/documents/[workspaceId]/[documentId]/editor/[documentPageId]/_components/document-editor";
 
@@ -10,11 +9,11 @@ const Page = async ({params} : {params: {domain: string}}) => {
     const domainData = await getDomainContent(params.domain.slice(0, -1));
     if(!domainData) return notFound();
 
-    const pageData = domainData.FunnelPages.find(page => !page.pathName);
+    const pageData = domainData.DocumentPages.find(page => !page.pathName);
 
     if(!pageData) return notFound();
 
-    await db.funnelPage.update({
+    await db.documentPage.update({
         where: {
             id: pageData.id
         },
@@ -28,11 +27,11 @@ const Page = async ({params} : {params: {domain: string}}) => {
     return ( 
 
         <EditorProvider 
-            subaccountId={domainData.subAccountId}
+            workspaceId={domainData.workspaceId}
             pageDetails={pageData}
-            funnelId={domainData.id}
+            documentId={domainData.id}
         >
-            <FunnelEditor funnelPageId={pageData.id} liveMode={true}/>
+            <FunnelEditor documentPageId={pageData.id} liveMode={true}/>
         </EditorProvider>
      );
 }

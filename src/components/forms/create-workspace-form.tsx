@@ -36,7 +36,6 @@ const CreateWorkspaceForm: React.FC<CreateWorkspaceProps> = ({
             name: defaultData?.name || '',
             description: defaultData?.description || '',
             favicon: defaultData?.favicon || '',
-            subDomainName: defaultData?.subDomainName || '',
         }
     })
 
@@ -46,7 +45,6 @@ const CreateWorkspaceForm: React.FC<CreateWorkspaceProps> = ({
                 description: defaultData.description || '',
                 favicon: defaultData.favicon || '',
                 name: defaultData.name || '',
-                subDomainName: defaultData.subDomainName || '',
             })
         }
     }, [defaultData])
@@ -118,20 +116,7 @@ const CreateWorkspaceForm: React.FC<CreateWorkspaceProps> = ({
                                 </FormItem>
                             )}
                         />
-                    <FormField 
-                            disabled={isLoading}
-                            control={form.control}
-                            name="subDomainName"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Sub Domain</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Sub Domain for funnel" {...field}/>
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
-
+                    
                         <FormField 
                             disabled={isLoading}
                             control={form.control}

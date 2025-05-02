@@ -67,7 +67,17 @@ const Page = async ({ params }: {
                 
             </TabsContent>
             <TabsContent value="templates">
-                <CreateTemplatetBnt agencyId={params.agencyId} />
+                 <div className="flex justify-between">
+                        <div className="flex-col">
+                            <h1 className="text-2xl">Welcome, {user ? user.firstName : "Guest"} </h1>
+                            <h3>Templates</h3>
+                        </div>
+                        <div className="flex gap-1">
+                        <CreateTemplatetBnt agencyId={params.agencyId} />
+                        </div>
+                    </div>
+
+                    <div className="grid grid-cols-3 gap-1 gap-y-6 mt-7">
                 {workspaces.filter(workspace => workspace.type === 'Template').map(workspace => (
                             <div key={workspace.id} className="ml-6">
                                 <TemplateCard
@@ -78,6 +88,7 @@ const Page = async ({ params }: {
                                 />
                             </div>
                         ))}
+                        </div>
             </TabsContent>
         </Tabs>
     </div>

@@ -5,16 +5,16 @@ import { getDocumentPageDetails} from "@/lib/queries"
 import { useWebEditor } from "@/providers/editor/editor-provider"
 import clsx from "clsx"
 import { EyeOff } from "lucide-react"
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import Recursive from "./document-editor-components/recursive"
 import { ScrollArea } from "@/components/ui/scroll-area"
+import ExportButton from "../export-pdf-btn"
 
 
 type Props = {
     documentPageId:string
     liveMode?: boolean
-    
-    
+    docName?: string
 }
 const FunnelEditor = ({documentPageId, liveMode}: Props) => {
     const {dispatch, state} = useWebEditor()
@@ -34,7 +34,7 @@ const FunnelEditor = ({documentPageId, liveMode}: Props) => {
         const fetchData = async () => {
             const res = await getDocumentPageDetails(documentPageId)
             if(!res)return
-
+            setDocName(res.name)
             dispatch({
                 type: 'LOAD_DATA',
                 payload: {
@@ -45,6 +45,10 @@ const FunnelEditor = ({documentPageId, liveMode}: Props) => {
         } 
         fetchData()
     }, [documentPageId])
+
+    const [docName, setDocName] = useState<string>('')
+
+   
 
     const handleClick = () => {
         dispatch({
@@ -77,14 +81,24 @@ const FunnelEditor = ({documentPageId, liveMode}: Props) => {
         
         > 
             {state.editor.previewMode && state.editor.liveMode && (
-                <Button 
-                    variant={'ghost'}
-                    size={'icon'}
-                    className="w-6 m-3 h-6 bg-slate-600 p-[2px] fixed top-0 left-0 z-[100]"
-                    onClick={handleUnpreview}
-                >
-                    <EyeOff/>
-                </Button>
+                <div className="flex items-center justify-between w-full fixed top-0 left-0 z-[100]">
+                    <div className="flex justify-between w-full">
+                        <Button 
+                            variant={'ghost'}
+                            size={'icon'}
+                            className="flex w-6 m-3 h-6 bg-slate-600 p-[2px] "
+                            onClick={handleUnpreview}
+                        >
+                            <EyeOff/>
+                        </Button>
+                        <div className="flex ml-auto  m-3">
+                            <ExportButton docName={docName}/>
+                        </div>
+                    </div>
+                    
+               
+                </div>
+                
             )}
             {Array.isArray(state.editor.elements) && 
                 state.editor.elements.map((childElement) => <Recursive key={childElement.id} element={childElement}/>)}

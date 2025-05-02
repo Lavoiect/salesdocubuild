@@ -26,7 +26,7 @@ const Recursive = ({element, index, parentId}: Props) => {
         case '2Col':
             return <Container index={index} element={element} parentId={parentId}/>
         case '3Col':
-            return <ThreeColumns index={index} element={element}/>
+            return <ThreeColumns index={index} element={element} parentId={parentId}/>
         case 'video':
             return <VideoComponent element={element} />
         case 'link':

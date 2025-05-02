@@ -6,16 +6,16 @@ import { notFound } from "next/navigation";
 const Page = async ({params}: {params: {domain: string; path: string}}) => {
 
     const domainData = await getDomainContent(params.domain.slice(0, -1));
-    const pageData = domainData?.FunnelPages.find(page => page.pathName === params.path);
+    const pageData = domainData?.DocumentPages.find(page => page.pathName === params.path);
 
     if(!pageData || !domainData) return notFound();
     return ( 
         <EditorProvider
-            subaccountId={domainData.subAccountId}
+            workspaceId={domainData.workspaceId}
             pageDetails={pageData}
-            funnelId={domainData.id}>
-            <FunnelEditor funnelPageId={pageData.id} liveMode={true}/>
-            </EditorProvider>
+            documentId={domainData.id}>
+                <FunnelEditor documentPageId={pageData.id} liveMode={true}/>
+        </EditorProvider>
     );
 }
  

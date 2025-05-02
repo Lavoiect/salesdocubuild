@@ -43,7 +43,6 @@ const CreateDocumentForm: React.FC<CreateDocumentProps> = ({
             name: defaultData?.name || '',
             description: defaultData?.description || '',
             favicon: defaultData?.favicon || '',
-            subDomainName: defaultData?.subDomainName || '',
             
         }
     })
@@ -57,7 +56,6 @@ const CreateDocumentForm: React.FC<CreateDocumentProps> = ({
                 description: defaultData.description || '',
                 favicon: defaultData.favicon || '',
                 name: defaultData.name || '',
-                subDomainName: defaultData.subDomainName || '',
             })
         }
     }, [defaultData])
@@ -139,19 +137,7 @@ const CreateDocumentForm: React.FC<CreateDocumentProps> = ({
                                  </FormItem>
                              )}
                          />
-                     <FormField 
-                             disabled={isLoading}
-                             control={form.control}
-                             name="subDomainName"
-                             render={({field}) => (
-                                 <FormItem>
-                                     <FormLabel>Sub Domain</FormLabel>
-                                     <FormControl>
-                                         <Input placeholder="Sub Domain for funnel" {...field}/>
-                                     </FormControl>
-                                 </FormItem>
-                             )}
-                         />
+                    
  
                          <FormField 
                              disabled={isLoading}

@@ -25,6 +25,6 @@ export const CreateTemplatetBnt = ({ agencyId }: Props) => {
     }
 
     return (
-        <Button className="hover:bg-fuchsia-300" onClick={handleCreateTemplate}>Templates</Button>
+        <Button className="hover:bg-fuchsia-300" onClick={handleCreateTemplate}>Create a Template Group</Button>
     )
 }

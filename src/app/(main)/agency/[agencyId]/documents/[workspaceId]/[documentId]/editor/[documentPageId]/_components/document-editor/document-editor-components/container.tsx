@@ -10,15 +10,19 @@ import Recursive from './recursive'
 import { ArrowDown, ArrowUp, Trash } from 'lucide-react'
 import { findParentContainerId } from '@/lib/utils' // adjust this path
 
+
 type Props = {
   element: EditorElement
   index?: number
   parentId?: string
+  forceLiveMode?: boolean
 }
 
-const Container = ({ element, index, parentId }: Props) => {
-  const { id, content, name, styles, type } = element
+const Container = ({ element, index, parentId, forceLiveMode = false }: Props) => {
   const { dispatch, state } = useWebEditor()
+  const isLive = forceLiveMode || state.editor.liveMode
+  
+  const { id, content, name, styles, type } = element
   const [dragOver, setDragOver] = useState(false)
 
   const handleDragLeave = () => setDragOver(false)
@@ -277,6 +281,7 @@ const Container = ({ element, index, parentId }: Props) => {
 
   return (
     <div
+    id="editor-root"
       style={styles}
       className={clsx('relative p-4 transition-all group', {
         'max-w-full w-full': ['container', '2Col', '3Col'],
@@ -310,7 +315,9 @@ const Container = ({ element, index, parentId }: Props) => {
       }
       onDragStart={handleDragStart}
     >
+     
       <Badge
+       data-editor-only
         className={clsx(
           'absolute -top-[23px] -left-[1px] rounded-none rounded-t-lg hidden',
           {
@@ -321,10 +328,10 @@ const Container = ({ element, index, parentId }: Props) => {
       >
         {name}
       </Badge>
-
+      
       {Array.isArray(content) && content.length > 0 ? (
         content.map((child, i) => (
-          <div key={`dropzone-${i}`} onDragOver={allowDrop} onDrop={(e) => handleOnDrop(e, i)}>
+          <div  key={`dropzone-${i}`} onDragOver={allowDrop} onDrop={(e) => handleOnDrop(e, i)}>
               <Recursive element={child} index={index} parentId={element.id} />
           </div>
 
