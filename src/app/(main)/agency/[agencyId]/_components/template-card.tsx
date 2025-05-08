@@ -44,7 +44,7 @@ const TemplateCard = async ({ agencyId, workspace, documents }: Props) => {
                                 <MenubarTrigger><PlusCircle className='text-primary' size={20} /></MenubarTrigger>
                                 <MenubarContent>
                                     <MenubarItem>
-                                        <span><CreateDocumentBnt workspaceId={workspace.id} useAi={false}/></span>
+                                        <span><CreateDocumentBnt workspaceId={workspace.id} useAi={false} type='Template'/></span>
                                     </MenubarItem>
                                    
 
@@ -89,7 +89,7 @@ const TemplateCard = async ({ agencyId, workspace, documents }: Props) => {
 
 
                                             <div className='flex gap-2 pt-1'>
-                                            <CreateFromTemplateBtn agencyId={agencyId} workspaces={workspaces} content={doc.DocumentPages[0].content} />                                            
+                                            <CreateFromTemplateBtn agencyId={agencyId} workspaces={workspaces} content={doc.DocumentPages[0].content} type='Document' />                                            
 
                                                 {doc.DocumentPages && doc.DocumentPages.length > 0 ? (
                                                     <Link href={`/agency/${agencyId}/documents/${doc.id}/${doc.id}/editor/${doc.DocumentPages[0].id}`}>

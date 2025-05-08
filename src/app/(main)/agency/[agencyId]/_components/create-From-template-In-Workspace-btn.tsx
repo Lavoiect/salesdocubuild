@@ -1,22 +1,16 @@
 'use client'
 
-import CreateDocFromTemplateForm from "@/components/forms/create-doc-from-Template"
 import CreateDocFromTemplateWorkspaceForm from "@/components/forms/create-doc-from-Template-workspace"
-import CreateDocumentForm from "@/components/forms/create-document-form"
-import CreateWorkspaceForm from "@/components/forms/create-workspace-form"
 import CustomModal from "@/components/global/custom-modal"
-import { Button } from "@/components/ui/button"
 import { useModal } from "@/providers/modal-provider"
-import { Workspace } from "@prisma/client"
-import { CopyPlusIcon, Sparkles } from "lucide-react"
 
 type Props = {
    workspaces: any
    agencyId: string
    workspaceId: string
-   
+   type: string
 }
-export const CreateFromTemplateInWorkspaceBtn = ({ agencyId, workspaces, workspaceId}: Props) => {
+export const CreateFromTemplateInWorkspaceBtn = ({ agencyId, workspaces, workspaceId, type}: Props) => {
     const {setOpen} = useModal()
 
     const handleCreateWorkspace = async () => {
@@ -27,7 +21,7 @@ export const CreateFromTemplateInWorkspaceBtn = ({ agencyId, workspaces, workspa
             >
                 
                
-                <CreateDocFromTemplateWorkspaceForm workspaces={workspaces} agencyId={agencyId} workspaceId={workspaceId} />
+                <CreateDocFromTemplateWorkspaceForm workspaces={workspaces} agencyId={agencyId} workspaceId={workspaceId} type={type} />
             </CustomModal>
         )
     }

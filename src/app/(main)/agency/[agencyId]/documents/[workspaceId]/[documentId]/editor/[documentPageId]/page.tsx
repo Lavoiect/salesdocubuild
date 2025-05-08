@@ -11,6 +11,8 @@ type Props = {
         documentId: string
         documentPageId: string
         workspaceId: string
+        agencyId: string
+
     }
 }
 
@@ -39,10 +41,10 @@ const Page = async ({params}:Props) => {
                 />
 
                 <div className="h-full flex justify-center">
-                    <FunnelEditor documentPageId={params.documentPageId}/>
+                    <FunnelEditor documentPageId={params.documentPageId} documentId={params.documentId}/>
                 </div>
 
-                <FunnelEditorSidebar subaccountId={params.workspaceId}/>
+                <FunnelEditorSidebar agencyId={params.agencyId}/>
             </EditorProvider>
         </div>
     )

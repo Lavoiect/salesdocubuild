@@ -1,9 +1,13 @@
 import AgencyDetails from "@/components/forms/agency-details";
+import { IdentifyUserClient } from "@/components/global/IdentifyUserClient";
 import { getAuthUserDetails, verifyAndAcceptInvitation } from "@/lib/queries";
 import { currentUser } from "@clerk/nextjs";
 import { Plan } from "@prisma/client";
 import { redirect } from "next/navigation";
 import React from "react";
+
+
+
 
 const Page = async ({searchParams}: 
     {searchParams: {plan: Plan; state: string; code: string}}) => {
@@ -13,6 +17,9 @@ const Page = async ({searchParams}:
 
     //Get user details
     const user = await getAuthUserDetails()
+
+
+
 
     if(agencyId){
        
@@ -34,8 +41,19 @@ const Page = async ({searchParams}:
     }
     const authUser = await currentUser()
     return ( 
+        
             <div className="flex justify-center items-center mt-4">
                 <div className="max-w-[850px] border-[1px] p-4 rounded-xl">
+                {user && user.Agency && (
+                    <IdentifyUserClient 
+                        user={{
+                            id: user.Agency.id,
+                            name: user.Agency.name,
+                            email: user.Agency.companyEmail,
+                        }} 
+                    />
+                )}
+
                     <h1 className="text-4xl">Create An Agency</h1>
                     <AgencyDetails
                         data={{companyEmail: authUser?.emailAddresses[0].emailAddress}}

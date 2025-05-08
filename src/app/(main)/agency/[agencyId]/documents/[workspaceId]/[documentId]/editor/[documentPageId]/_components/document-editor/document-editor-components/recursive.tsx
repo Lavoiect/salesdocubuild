@@ -11,11 +11,13 @@ type Props = {
     element: EditorElement
     index?: number
     parentId?: string
-
+   
 }
 
+
+
 const Recursive = ({element, index, parentId}: Props) => {
-  
+
     switch (element.type) {
         case 'text':
           return <TextComponent  key={element.id} element={element}/>

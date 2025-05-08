@@ -4,7 +4,7 @@ import { GetMediaFiles } from "@/lib/types"
 import { useEffect, useState } from "react"
 
 type Props = {
-    subaccountId:string
+    agencyId:string
 }
 
 const MediaBucketTab = (props: Props) => {
@@ -12,17 +12,17 @@ const MediaBucketTab = (props: Props) => {
 
     useEffect(() =>{
         const fetchData = async () => {
-            const response = await getMedia(props.subaccountId)
+            const response = await getMedia(props.agencyId)
             setdata(response)
         }
         fetchData()
-    }, [props.subaccountId])
+    }, [props.agencyId])
 
     return (
         <div className="h-[900px] overflow-scroll p-4">
             <MediaComponent
                 data={data}
-                subaccountId={props.subaccountId}
+                agencyId={props.agencyId}
                 />
 
         </div>

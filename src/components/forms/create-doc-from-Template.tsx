@@ -37,7 +37,8 @@ interface CreateDocFromTemplateProps {
     defaultData?: Document
     agencyId: string
     workspaces: Workspace[]
-    content: string
+    content: string,
+    type: string
 }
 
 const CreateDocFromTemplateForm: React.FC<CreateDocFromTemplateProps> = ({
@@ -45,6 +46,7 @@ const CreateDocFromTemplateForm: React.FC<CreateDocFromTemplateProps> = ({
     content,
     workspaces,
     agencyId,
+    type
 }) => {
     const { setClose } = useModal()
     const router = useRouter()
@@ -55,7 +57,6 @@ const CreateDocFromTemplateForm: React.FC<CreateDocFromTemplateProps> = ({
             name: defaultData?.name || '',
             description: defaultData?.description || '',
             favicon: defaultData?.favicon || '',
-            subDomainName: defaultData?.subDomainName || '',
 
         }
     })
@@ -67,7 +68,6 @@ const CreateDocFromTemplateForm: React.FC<CreateDocFromTemplateProps> = ({
                 description: defaultData.description || '',
                 favicon: defaultData.favicon || '',
                 name: defaultData.name || '',
-                subDomainName: defaultData.subDomainName || '',
             })
         }
     }, [defaultData])
@@ -82,7 +82,9 @@ const CreateDocFromTemplateForm: React.FC<CreateDocFromTemplateProps> = ({
             value,
             { ...values },
             defaultData?.id || v4(),
-            content
+            type,
+            content,
+           
         )
         await saveActivityLogsNotification({
             agencyId: agencyId,
@@ -140,26 +142,14 @@ const CreateDocFromTemplateForm: React.FC<CreateDocFromTemplateProps> = ({
                             name="description"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel>Funnel Description</FormLabel>
+                                    <FormLabel>Template</FormLabel>
                                     <FormControl>
                                         <Input placeholder="Funnel Description" {...field} />
                                     </FormControl>
                                 </FormItem>
                             )}
                         />
-                        <FormField
-                            disabled={isLoading}
-                            control={form.control}
-                            name="subDomainName"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Sub Domain</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Sub Domain for funnel" {...field} />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
+                       
 
                         <FormField
                             disabled={isLoading}

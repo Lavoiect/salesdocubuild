@@ -5,7 +5,7 @@ import { useForm } from "react-hook-form"
 import { zodResolver } from "@hookform/resolvers/zod"
 import { ContactUserFormSchema } from "@/lib/types"
 import { z } from "zod"
-import { saveActivityLogsNotification, upsertContact } from "@/lib/queries"
+import { saveActivityLogsNotification } from "@/lib/queries"
 import { toast } from "../ui/use-toast"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "../ui/card"
 import { Form, FormControl, FormField, FormItem, FormLabel } from "../ui/form"
@@ -47,7 +47,7 @@ const ContactUserForm: React.FC<ContactUserFormProps> = ({subaccountId}) => {
             await saveActivityLogsNotification({
                 agencyId: undefined,
                 description: `Upadated a contact | ${response?.name}`,
-                subaccountId: subaccountId
+                agencyId: subaccountId
             })
             toast({
                 title: 'Sucess',

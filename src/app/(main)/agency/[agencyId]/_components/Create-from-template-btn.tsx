@@ -12,9 +12,9 @@ type Props = {
    workspaces: any
    agencyId: string
    content: string
-   
+   type: string
 }
-export const CreateFromTemplateBtn = ({ agencyId, workspaces, content}: Props) => {
+export const CreateFromTemplateBtn = ({ agencyId, workspaces, content, type}: Props) => {
     const {setOpen} = useModal()
 
     const handleCreateWorkspace = async () => {
@@ -24,7 +24,7 @@ export const CreateFromTemplateBtn = ({ agencyId, workspaces, content}: Props) =
                 subheading="Create a workspace for your documents"
             >
                
-                <CreateDocFromTemplateForm workspaces={workspaces} agencyId={agencyId} content={content}/>
+                <CreateDocFromTemplateForm workspaces={workspaces} agencyId={agencyId} content={content} type={type}/>
             </CustomModal>
         )
     }

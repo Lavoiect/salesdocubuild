@@ -1,5 +1,5 @@
 'use client'
-import { TypeOf, z } from "zod";
+import { z } from "zod";
 import { useToast } from "../ui/use-toast";
 import { useRouter } from "next/navigation";
 import { useForm } from "react-hook-form";
@@ -10,16 +10,18 @@ import { createMedia, saveActivityLogsNotification } from "@/lib/queries";
 import { Input } from "../ui/input";
 import FileUpload from "../global/file-upload";
 import { Button } from "../ui/button";
+import { useModal } from "@/providers/modal-provider";
 
 type Props = {
-    subaccountId: string;
+    agencyId: string;
 }
 
 const formSchema = z.object({
     link: z.string().min(1, {message: 'Media file is required'}),
     name: z.string().min(1, {message: 'Name is required'})
 })
-const UploadMediaForm = ({ subaccountId }: Props) => {
+const UploadMediaForm = ({ agencyId }: Props) => {
+    const {setClose} = useModal()
     const {toast} = useToast()
     const router = useRouter()
     const form = useForm<z.infer<typeof formSchema>>({
@@ -33,14 +35,14 @@ const UploadMediaForm = ({ subaccountId }: Props) => {
 
     async function onSubmit(values: z.infer<typeof formSchema>) {
         try {
-            const response = await createMedia(subaccountId, values)
+            const response = await createMedia(agencyId, values)
             await saveActivityLogsNotification({
-                agencyId: undefined,
+                agencyId: response.agencyId,
                 description: `Uploaded a media file | ${response.name}`,
-                subaccountId: subaccountId
             })
 
             toast({title: 'Success', description: 'Uploaded Media File'})
+            setClose()
             router.refresh()
         } catch (error) {
             console.log(error)

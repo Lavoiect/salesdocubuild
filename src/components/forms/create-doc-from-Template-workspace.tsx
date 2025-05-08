@@ -1,5 +1,5 @@
 'use client'
-import { getDocuments, getTemplates, getWorkspaces, saveActivityLogsNotification, upsertDocument, upsertDocumentFromTemplate } from "@/lib/queries";
+import { saveActivityLogsNotification, upsertDocumentFromTemplate } from "@/lib/queries";
 import { CreateDocumentFormSchema } from "@/lib/types";
 import { useModal } from "@/providers/modal-provider";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -50,15 +50,15 @@ interface CreateDocFromTemplateWorkspaceProps {
     agencyId: string
     workspaces: Workspace[]
     workspaceId: string
-    
+    type: string
 }
 
 const CreateDocFromTemplateWorkspaceForm: React.FC<CreateDocFromTemplateWorkspaceProps> = ({
     defaultData,
     workspaces,
     agencyId,
-    workspaceId
-
+    workspaceId,
+    type
 }) => {
     const { setClose } = useModal()
     const router = useRouter()
@@ -69,7 +69,6 @@ const CreateDocFromTemplateWorkspaceForm: React.FC<CreateDocFromTemplateWorkspac
             name: defaultData?.name || '',
             description: defaultData?.description || '',
             favicon: defaultData?.favicon || '',
-            subDomainName: defaultData?.subDomainName || '',
 
         }
     })
@@ -82,7 +81,6 @@ const CreateDocFromTemplateWorkspaceForm: React.FC<CreateDocFromTemplateWorkspac
                 description: defaultData.description || '',
                 favicon: defaultData.favicon || '',
                 name: defaultData.name || '',
-                subDomainName: defaultData.subDomainName || '',
             })
         }
     }, [defaultData])
@@ -97,7 +95,9 @@ const CreateDocFromTemplateWorkspaceForm: React.FC<CreateDocFromTemplateWorkspac
             workspaceId,
             { ...values },
             defaultData?.id || v4(),
-           value
+            type,
+           value,
+           
         )
         await saveActivityLogsNotification({
             agencyId: agencyId,
@@ -162,19 +162,7 @@ const CreateDocFromTemplateWorkspaceForm: React.FC<CreateDocFromTemplateWorkspac
                                 </FormItem>
                             )}
                         />
-                        <FormField
-                            disabled={isLoading}
-                            control={form.control}
-                            name="subDomainName"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Sub Domain</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Sub Domain for funnel" {...field} />
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
+                        
 
                         <FormField
                             disabled={isLoading}

@@ -48,7 +48,6 @@ export const CreateDocumentFormSchema = z.object({
     name: z.string().min(1),
     description: z.string(),
     favicon: z.string().optional(),
-
 })
 
 export const CreateWorkspaceFormSchema = z.object({

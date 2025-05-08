@@ -35,6 +35,7 @@ export type EditorAction =
   | { type: 'SET_FUNNELPAGE_ID'; payload: { funnelPageId: string } }
   | { type: 'REFRESH_EDITOR_STATE' }
   | { type: 'REORDER_ELEMENTS'; payload: { sourceElementId: string; targetContainerId: string; targetIndex: number } }
+  | { type: 'SET_DOCUMENT_ID'; payload: { documentId: string } }
 
 
 
@@ -45,6 +46,7 @@ export type Editor = {
   device: DeviceTypes
   previewMode: boolean
   documentPageId: string
+  documentId: string
 }
 
 export type HistoryState = {
@@ -78,6 +80,7 @@ const initialEditorState: EditorState['editor'] = {
   previewMode: false,
   liveMode: false,
   documentPageId: '',
+  documentId: ''
 }
 
 const initialHistoryState: HistoryState = {
@@ -361,6 +364,7 @@ const editorReducer = (
       }
       return changedDeviceState
 
+     
     case 'TOGGLE_PREVIEW_MODE':
       const toggleState = {
         ...state,
@@ -447,6 +451,16 @@ const editorReducer = (
         },
       }
       return funnelPageIdState
+  
+      case 'SET_DOCUMENT_ID':
+      return {
+        ...state,
+        editor: {
+          ...state.editor,
+          documentId: action.payload.documentId,
+        },
+      }
+
 
     default:
       return state

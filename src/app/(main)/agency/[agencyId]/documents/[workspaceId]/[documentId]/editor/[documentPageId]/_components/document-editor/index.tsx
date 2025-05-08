@@ -11,14 +11,18 @@ import { ScrollArea } from "@/components/ui/scroll-area"
 import ExportButton from "../export-pdf-btn"
 
 
+
+
 type Props = {
     documentPageId:string
     liveMode?: boolean
     docName?: string
+    documentId?: string
 }
-const FunnelEditor = ({documentPageId, liveMode}: Props) => {
-    const {dispatch, state} = useWebEditor()
+const FunnelEditor = ({documentPageId, liveMode, documentId}: Props) => {
+    
 
+    const {dispatch, state} = useWebEditor()
     useEffect(() => {
         if(liveMode){
             dispatch({
@@ -48,8 +52,14 @@ const FunnelEditor = ({documentPageId, liveMode}: Props) => {
 
     const [docName, setDocName] = useState<string>('')
 
-   
+    useEffect(() => {
+        if (documentId) {
+          dispatch({ type: 'SET_DOCUMENT_ID', payload: { documentId } })
+        }
+       
+      }, [documentId])
 
+      
     const handleClick = () => {
         dispatch({
             type: 'CHANGE_CLICKED_ELEMENT',
@@ -64,6 +74,7 @@ const FunnelEditor = ({documentPageId, liveMode}: Props) => {
             type: 'TOGGLE_LIVE_MODE'
         })
     }
+    
     return (
         <ScrollArea 
         className={clsx(
@@ -93,6 +104,7 @@ const FunnelEditor = ({documentPageId, liveMode}: Props) => {
                         </Button>
                         <div className="flex ml-auto  m-3">
                             <ExportButton docName={docName}/>
+                           
                         </div>
                     </div>
                     

@@ -124,6 +124,7 @@ model Document {
   published     Boolean      @default(false)
   subDomainName String?      @unique
   favicon       String?      @db.Text
+  type          String
   workspaceId   String
   Workspace     Workspace @relation(fields: [workspaceId], references: [id], onDelete: Cascade)
   DocumentPages DocumentPage[]

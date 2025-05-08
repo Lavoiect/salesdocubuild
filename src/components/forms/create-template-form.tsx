@@ -36,7 +36,6 @@ const CreateTemplateForm: React.FC<CreateTemplateProps> = ({
             name: defaultData?.name || '',
             description: defaultData?.description || '',
             favicon: defaultData?.favicon || '',
-            subDomainName: defaultData?.subDomainName || '',
         }
     })
 
@@ -46,7 +45,6 @@ const CreateTemplateForm: React.FC<CreateTemplateProps> = ({
                 description: defaultData.description || '',
                 favicon: defaultData.favicon || '',
                 name: defaultData.name || '',
-                subDomainName: defaultData.subDomainName || '',
             })
         }
     }, [defaultData])
@@ -58,7 +56,7 @@ const CreateTemplateForm: React.FC<CreateTemplateProps> = ({
         const res = await upsertTemplate(
             agencyId,
             {...values},
-            defaultData?.id || v4()
+            defaultData?.id || v4(),
         )
         await saveActivityLogsNotification({
             agencyId: agencyId,
@@ -118,19 +116,7 @@ const CreateTemplateForm: React.FC<CreateTemplateProps> = ({
                                 </FormItem>
                             )}
                         />
-                    <FormField 
-                            disabled={isLoading}
-                            control={form.control}
-                            name="subDomainName"
-                            render={({field}) => (
-                                <FormItem>
-                                    <FormLabel>Sub Domain</FormLabel>
-                                    <FormControl>
-                                        <Input placeholder="Sub Domain for funnel" {...field}/>
-                                    </FormControl>
-                                </FormItem>
-                            )}
-                        />
+                   
 
                         <FormField 
                             disabled={isLoading}

@@ -2,8 +2,6 @@ import { EditorElement } from "@/providers/editor/editor-provider";
 import { type ClassValue, clsx } from "clsx"
 import { twMerge } from "tailwind-merge"
 
-import html2canvas from 'html2canvas'
-import jsPDF from 'jspdf'
 
 
 export function cn(...inputs: ClassValue[]) {
@@ -29,7 +27,16 @@ export const findParentContainerId = (
 };
 
 
-// utils/exportToPdf.ts
+export function formatDuration(seconds: number): string {
+  const minutes = Math.floor(seconds / 60)
+  const secs = Math.round(seconds % 60)
+
+  const parts = []
+  if (minutes > 0) parts.push(`${minutes}m`)
+  if (secs > 0 || parts.length === 0) parts.push(`${secs}s`)
+
+  return parts.join(" ")
+}
 
 
 

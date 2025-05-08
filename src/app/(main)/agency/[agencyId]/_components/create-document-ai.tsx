@@ -19,7 +19,7 @@ export const CreateDocumentAiBnt = ({ workspaceId, useAi, agencyId }: Props) => 
                 title="Create a Document With AI"
                 subheading="Create a workspace for your documents"
             >
-                <CreateDocumentForm  useAi={useAi} workspaceId={workspaceId}/>
+                <CreateDocumentForm  useAi={useAi} workspaceId={workspaceId} type='Document'/>
                 
             </CustomModal>
         )

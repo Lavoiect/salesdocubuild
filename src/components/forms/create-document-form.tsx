@@ -26,13 +26,14 @@ interface CreateDocumentProps {
     defaultData?: Document
     workspaceId:string
     useAi: boolean,
-   
+    type: string
 }
 
 const CreateDocumentForm: React.FC<CreateDocumentProps> = ({
     defaultData,
     workspaceId,
     useAi,
+    type
 }) => {
     const {setClose} = useModal()
     const router = useRouter()
@@ -71,8 +72,10 @@ const CreateDocumentForm: React.FC<CreateDocumentProps> = ({
             workspaceId,
             {...values},
             documentId,
+            type,
             undefined,
             useAi
+            
         )
         setDocId(documentId)
         await saveActivityLogsNotification({

@@ -10,9 +10,9 @@ import MediaBucketTab from "./tabs/media-bucket-tab"
 import ComponentsTab from "./tabs/component-tab"
 
 type Props = {
-   subaccountId: string
+   agencyId: string
 }
-const FunnelEditorSidebar = ({subaccountId}: Props) => {
+const FunnelEditorSidebar = ({agencyId}: Props) => {
     const {state, dispatch} = useWebEditor()
     return (
        <Sheet
@@ -52,8 +52,8 @@ const FunnelEditorSidebar = ({subaccountId}: Props) => {
                             <SettingsTab/>
                         </TabsContent>
                         <TabsContent value="Media" className="">
-                            <MediaBucketTab subaccountId={subaccountId}/>
-
+                            <MediaBucketTab agencyId={agencyId}/>
+                               
                         </TabsContent>
                         <TabsContent value="Components">
                             <SheetHeader className="text-left p-6">

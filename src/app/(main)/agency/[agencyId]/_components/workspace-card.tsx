@@ -70,12 +70,12 @@ const WorkspaceCard = async ({ agencyId, workspace, documents }: Props) => {
                                         <span><CreateDocumentAiBnt agencyId={agencyId} useAi={true} workspaceId={workspace.id} /></span>
                                     </MenubarItem>
                                     <MenubarItem>
-                                        <span><CreateDocumentBnt useAi={false} workspaceId={workspace.id} /></span>
+                                        <span><CreateDocumentBnt useAi={false} workspaceId={workspace.id} type='Document' /></span>
 
                                     </MenubarItem>
 
                                     <MenubarItem>
-                                        <span><CreateFromTemplateInWorkspaceBtn agencyId={agencyId} workspaces={workspaces} workspaceId={workspace.id} /></span>
+                                        <span><CreateFromTemplateInWorkspaceBtn agencyId={agencyId} workspaces={workspaces} workspaceId={workspace.id} type='Document' /></span>
 
                                     </MenubarItem>
                                 </MenubarContent>

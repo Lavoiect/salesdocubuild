@@ -9,8 +9,9 @@ import { useModal } from "@/providers/modal-provider"
 type Props = {
    workspaceId: string
    useAi: boolean
+   type: string
 }
-export const CreateDocumentBnt = ({ workspaceId, useAi }: Props) => {
+export const CreateDocumentBnt = ({ workspaceId, useAi, type }: Props) => {
     const {setOpen} = useModal()
 
     const handleCreateWorkspace = async () => {
@@ -23,7 +24,7 @@ export const CreateDocumentBnt = ({ workspaceId, useAi }: Props) => {
                
                 {String(useAi)}
                </div>
-                <CreateDocumentForm useAi={useAi} workspaceId={workspaceId}/>
+                <CreateDocumentForm useAi={useAi} workspaceId={workspaceId} type={type}/>
             </CustomModal>
         )
     }

@@ -19,28 +19,31 @@ export default function MediaCard({ file }: Props) {
     return (
         <AlertDialog>
             <DropdownMenu>
-                <article className="border w-full rounded-lg bg-slate-900">
+                <article className="border w-full rounded-lg bg-slate-100">
                     <div className="relative w-full h-40">
                         <Image
                             src={file.link}
                             alt='Preview image'
                             fill
-                            className='object-cover rounded-lg'
+                            className='object-cover rounded-lg p-2'
                         />
                     </div>
                     <p className="opacity-0 h-0 w-0">{file.name}</p>
                     <div className="p-4 relative">
-                        <p className="text-muted-foreground">{file.createdAt.toDateString()}</p>
-                        <p>{file.name}</p>
+                        <div className="text-muted-foreground flex-col gap-2 items-center">
+                            <div>Created:</div>
+                            <div>{file.createdAt.toDateString()}</div>
+                        </div>
+                        <p className="text-primary font-semibold pt-1 bold">{file.name}</p>
                         <div className="absolute top-4 right-4 p-[1px] cursor-pointer" onClick={() =>{}}>
                             <DropdownMenuTrigger>
-                                <MoreHorizontal/>
+                                <MoreHorizontal className="text-primary"/>
                             </DropdownMenuTrigger>
                         </div>
                     </div>
 
-                    <DropdownMenuContent>
-                        <DropdownMenuLabel>Menu</DropdownMenuLabel>
+                    <DropdownMenuContent side="top" align="end">
+                        <DropdownMenuLabel className="text-primary">Menu</DropdownMenuLabel>
                         <DropdownMenuSeparator/>
                         <DropdownMenuItem
                             className="flex gap-2"
@@ -79,9 +82,9 @@ export default function MediaCard({ file }: Props) {
                             setLoading(true)
                             const response = await deleteMedia(file.id)
                             await saveActivityLogsNotification({
-                                agencyId: undefined,
+                                agencyId: response.agencyId,
                                 description: `Deleted a media file | ${response?.name}`,
-                                subaccountId: response.subAccountId,
+                               
                             })
                             toast({
                                 title: 'File has been deleted',

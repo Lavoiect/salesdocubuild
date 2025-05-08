@@ -6,6 +6,13 @@ import { Trash } from 'lucide-react'
 import Link from 'next/link'
 import React, { CSSProperties } from 'react'
 import { Button } from "@/components/ui/button"
+import posthog from 'posthog-js';
+
+
+
+
+
+
 
 type Props = {
   element: EditorElement
@@ -14,7 +21,9 @@ type Props = {
 }
 
 const ButtonComponent = (props: Props) => {
+  
   const { dispatch, state } = useWebEditor()
+  const { documentId } = useWebEditor()
 
   
   const handleDrop = (e: React.DragEvent) => {
@@ -52,6 +61,8 @@ const ButtonComponent = (props: Props) => {
   }
 
   const handleOnClickBody = (e: React.MouseEvent) => {
+    
+
     e.stopPropagation()
     dispatch({
       type: 'CHANGE_CLICKED_ELEMENT',
@@ -73,6 +84,8 @@ const ButtonComponent = (props: Props) => {
     })
   }
 
+  
+
   return (
     <div
       draggable={!state.editor.liveMode}
@@ -93,7 +106,7 @@ const ButtonComponent = (props: Props) => {
     >
       {state.editor.selectedElement.id === props.element.id && !state.editor.liveMode && (
         <Badge className='absolute -top-[23px] -left-[1px] rounded-none rounded-t-lg'>
-          {state.editor.selectedElement.name}
+          {state.editor.selectedElement.name} 
         </Badge>
       )}
 
@@ -109,9 +122,16 @@ const ButtonComponent = (props: Props) => {
           onMouseLeave={(e) => {
             e.currentTarget.style.backgroundColor = bgColor
           }}
+          onClick={() => {
+            posthog.capture('cta_click', {
+              documentId: documentId,
+              cta_label: 'CTA Action',
+              location: 'Document', 
+            });
+          }}
         >
           <Link href={content.href || '#'}>
-            {content.innerText || 'Button Text'}
+            {content.innerText || 'Button Text'} 
           </Link>
         </Button>
       )}
@@ -154,7 +174,7 @@ const ButtonComponent = (props: Props) => {
                 })
               }}
             >
-              {content.innerText || 'Button Text'}
+              {content.innerText || 'Button Text'} {state.editor.documentId}
             </div>
           )}
         </div>
@@ -167,6 +187,7 @@ const ButtonComponent = (props: Props) => {
             size={16}
             onClick={handleDeleteElement}
           />
+         
         </div>
       )}
     </div>

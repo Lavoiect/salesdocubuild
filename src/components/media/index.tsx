@@ -12,13 +12,13 @@ const MediaComponent = ({ data, agencyId }: Props) => {
     return (
         <div className="flex flex-col gap-4 h-full w-full">
             <div className="flex justify-between items-center">
-                <h1 className="text-4xl">Media Bucket</h1>
-                <MediaUploadButton subaccountId={agencyId}/>
+                <h1 className="text-2xl">Media Bucket</h1>
+                <MediaUploadButton agencyId={agencyId}/>
             </div>
             <Command className="bg-transparent">
-                <CommandInput placeholder="search for filename" />
+                <CommandInput placeholder="search for filename" className="w-1/4" />
                 <CommandList className="pb-40 max-h-full">
-                <CommandGroup heading="Meida files">
+                <CommandGroup>
                     <div className="flex flex-wrap gap-4 pt-4">
                         {data?.Media.map((file) => (
                             <CommandItem 

@@ -303,22 +303,22 @@ export const sendInvitation = async (
     return response
 }
 
-export const getMedia =async (subaccountId:string) => {
+export const getMedia =async (agencyId:string) => {
     const mediafiles = await db.agency.findUnique({
         where: {
-            id: subaccountId,
+            id: agencyId,
         },
         include: {Media: true}
     })
     return mediafiles
 }
 
-export const createMedia =async (subaccountId:string, mediaFile: CreateMediaType) => {
+export const createMedia =async (agencyId:string, mediaFile: CreateMediaType) => {
     const response = await db.media.create({
         data: {
             link: mediaFile.link,
             name: mediaFile.name,
-            agencyId: subaccountId
+            agencyId: agencyId
         }
     })
 
@@ -340,6 +340,7 @@ export const upsertDocument = async (
     workspaceId : string,
     document: z.infer<typeof CreateDocumentFormSchema>,
     documentId: string,
+    type: string,
     documentPageContent?: string,
     useAI?: boolean
 ) => {
@@ -352,7 +353,8 @@ export const upsertDocument = async (
             ...document,
             id: docId,
             subDomainName: docId, // Generate a unique string for subDomainName
-            workspaceId: workspaceId
+            workspaceId: workspaceId,
+            type: type,
         }
     })
     if(!useAI){
@@ -375,15 +377,20 @@ export const upsertDocumentFromTemplate = async (
     workspaceId : string,
     document: z.infer<typeof CreateDocumentFormSchema>,
     documentId: string,
-    documentPageId?: string
+    type: string,
+    documentPageId?: string,
+   
 ) => {
+    const docId = documentId || v4()
     const response = await db.document.upsert({
         where: {id: documentId},
         update: document,
         create: {
             ...document,
-            id: documentId || v4(),
-            workspaceId: workspaceId
+            id: docId,
+            workspaceId: workspaceId,
+            subDomainName: docId,
+            type: type,
         }
     })
 
@@ -399,7 +406,6 @@ export const upsertDocumentFromTemplate = async (
                     order: 0,
                     pathName: '',
                     content: documentPage.DocumentPages[0].content,
-                    
                   },
                 documentId)
         }
@@ -438,7 +444,8 @@ export const upsertWorkspace = async (
 export const upsertTemplate = async (
     agencyId : string,
     workspace: z.infer<typeof CreateWorkspaceFormSchema>,
-    workspaceId: string
+    workspaceId: string,
+   
 ) => {
     const response = await db.workspace.upsert({
         where: {id: workspaceId},
