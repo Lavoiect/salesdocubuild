@@ -15,12 +15,15 @@ export async function GET(req: Request) {
   }
 
   try {
-    const [viewsRes, uniqueRes, timeRes, clickRes, scrollRes] = await Promise.all([
+    const [viewsRes, uniqueRes, timeRes, clickRes, scrollRes, topCountryRes, geoBreakdown, sessionEvents] = await Promise.all([
       fetchTrend("document_viewed", documentId, start, end),
       fetchTrend("document_viewed", documentId, start, end, true),
       fetchTimeSpent(documentId, start, end),
       fetchTrend("cta_click", documentId, start, end),
       fetchScrollDepth(documentId, start, end),
+      fetchTopCountry(documentId, start, end),
+      fetchGeoBreakdown(documentId, start, end),
+      fetchSessionEvents(documentId, start, end),
     ]);
 
     const totalViews = viewsRes.reduce((acc: number, d: { day: string; count: number }) => acc + d.count, 0);
@@ -52,7 +55,12 @@ export async function GET(req: Request) {
         average: scrollRes.lifetimeAvg,
         results: scrollRes.dailyAverages.map((d) => [d.day, d.average]),
       },
+      topCountry: topCountryRes,
+      geoBreakdown,
+      viewsTable: sessionEvents,
     });
+    
+
   } catch (error) {
     console.error("PostHog error:", error);
     return NextResponse.json({ error: "Failed to fetch analytics" }, { status: 500 });
@@ -190,3 +198,137 @@ async function fetchScrollDepth(documentId: string, start: string, end: string) 
     dailyAverages,
   };
 }
+
+async function fetchTopCountry(documentId: string, start: string, end: string) {
+    const url = `${POSTHOG_API_HOST}/api/projects/${PROJECT_ID}/events/?event=document_viewed&after=${start}&before=${end}`;
+  
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${POSTHOG_API_KEY}`,
+      },
+    });
+  
+    const json = await res.json();
+    const events = json?.results || [];
+  
+    const countryCounts: Record<string, number> = {};
+  
+    for (const e of events) {
+      if (e.properties?.documentId !== documentId) continue;
+  
+      const country = e.properties?.country || e.properties?.$geoip_country_name;
+      if (!country) continue;
+  
+      countryCounts[country] = (countryCounts[country] || 0) + 1;
+    }
+  
+    const topEntry = Object.entries(countryCounts).sort((a, b) => b[1] - a[1])[0];
+  
+    return {
+      country: topEntry?.[0] || null,
+      count: topEntry?.[1] || 0,
+    };
+  }
+
+  async function fetchGeoBreakdown(documentId: string, start: string, end: string) {
+    const url = `${POSTHOG_API_HOST}/api/projects/${PROJECT_ID}/events/?event=document_viewed&after=${start}&before=${end}`;
+  
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${POSTHOG_API_KEY}`,
+      },
+    });
+  
+    const json = await res.json();
+    const events = json?.results || [];
+  
+    const locationMap: Record<string, { country: string; state: string; zip: string; count: number }> = {};
+  
+    for (const e of events) {
+      if (e.properties?.documentId !== documentId) continue;
+  
+      const country = e.properties?.country || e.properties?.$geoip_country_name || "Unknown";
+      const state = e.properties?.region || e.properties?.$geoip_subdivision_1_name || "Unknown";
+      const zip = e.properties?.zip || e.properties?.$geoip_postal_code || "Unknown";
+  
+      const key = `${country}__${state}__${zip}`;
+      if (!locationMap[key]) {
+        locationMap[key] = { country, state, zip, count: 0 };
+      }
+  
+      locationMap[key].count += 1;
+    }
+  
+    return Object.values(locationMap).sort((a, b) => b.count - a.count);
+  }
+  async function fetchSessionEvents(documentId: string, start: string, end: string) {
+    const url = `${POSTHOG_API_HOST}/api/event/?after=${start}&before=${end}`;
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${POSTHOG_API_KEY}`,
+      },
+    });
+  
+    const json = await res.json();
+    const events = json?.results || [];
+  
+    console.log("Fetched total events:", events.length);
+  
+    const sessions: Record<
+      string,
+      {
+        distinctId: string;
+        timestamp: string;
+        country: string;
+        region: string;
+        zip: string;
+        timeSpent?: number;
+        scrollDepth?: number;
+        ctaClicked?: boolean;
+      }
+    > = {};
+  
+    for (const e of events) {
+      const { event, properties, timestamp, distinct_id } = e;
+      if (!properties || properties.documentId !== documentId) continue;
+  
+      // Group by sessionId (if exists), otherwise fallback
+      const sessionKey = properties.sessionId || `${distinct_id}-${timestamp.slice(0, 13)}`;
+  
+      if (!sessions[sessionKey]) {
+        sessions[sessionKey] = {
+          distinctId: distinct_id,
+          timestamp,
+          country: properties.country || properties.$geoip_country_name || "Unknown",
+          region: properties.region || properties.$geoip_subdivision_1_name || "Unknown",
+          zip: properties.zip || properties.$geoip_postal_code || "Unknown",
+          timeSpent: 0,
+          scrollDepth: 0,
+          ctaClicked: false,
+        };
+      }
+  
+      if (event === "document_time_spent") {
+        sessions[sessionKey].timeSpent = parseFloat(properties?.duration || "0");
+      }
+  
+      if (event === "scroll_depth") {
+        const percent = parseFloat(properties?.percent || "0");
+        if (percent > (sessions[sessionKey].scrollDepth || 0)) {
+          sessions[sessionKey].scrollDepth = percent;
+        }
+      }
+  
+      if (event === "cta_click") {
+        sessions[sessionKey].ctaClicked = true;
+      }
+    }
+  
+    return Object.values(sessions).sort(
+      (a, b) => new Date(b.timestamp).getTime() - new Date(a.timestamp).getTime()
+    );
+  }
+  
+  
+  
+  

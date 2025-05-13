@@ -1,19 +1,8 @@
 "use client";
 
 import { Card, CardHeader } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
 import { useEffect, useState } from "react";
 
-import {
-    LineChart,
-    Line,
-    XAxis,
-    YAxis,
-    Tooltip,
-    CartesianGrid,
-    ResponsiveContainer,
-    Legend,
-} from "recharts";
 
 interface Document {
     id: string;
@@ -30,9 +19,16 @@ import {
 import { get } from "http";
 import { getDocuments } from "@/lib/queries";
 import { Separator } from "@/components/ui/separator";
-import { ChartArea, RocketIcon } from "lucide-react";
+import { ChartArea, RocketIcon,Table2 } from "lucide-react";
 import { set } from "date-fns";
 import Graph from "./_components/Graph";
+import GeoTable from "./_components/GeoTable";
+import ViewsTable from "./_components/ViewsTable";
+
+
+
+
+
 
 interface DocumentAnalyticsProps {
     agencyId: string;
@@ -51,9 +47,9 @@ export default function DocumentAnalytics(props: DocumentAnalyticsProps) {
     const [analyticsData, setAnalyticsData] = useState<any>(null);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState("");
-    const [activeSection, setActiveSection] = useState<"views" | "engagement" | "table" | null>(null);
+    const [activeSection, setActiveSection] = useState<"views" | "engagement" | "table" | "demographics" | null>(null);
 
-    const setGraphData = (graphType: "views" | "engagement") => {
+    const setGraphData = (graphType: "views" | "engagement" | "demographics") => {
         setActiveSection((prev) => (prev === graphType ? "table" : graphType));
     };
 
@@ -94,6 +90,8 @@ export default function DocumentAnalytics(props: DocumentAnalyticsProps) {
             ...(analyticsData?.uniqueViewers?.results || []).map(([d]: [string]) => normalizeDate(d)),
             ...(analyticsData?.timeOnPage?.results || []).map(([d]: [string]) => normalizeDate(d)),
             ...(analyticsData?.CTAClicks?.results || []).map(([d]: [string]) => normalizeDate(d)),
+            ...(analyticsData?.scrollDepth?.results || []).map(([d]: [string]) => normalizeDate(d)),
+
         ])
     ).sort((a, b) => new Date(a).getTime() - new Date(b).getTime());
 
@@ -102,7 +100,7 @@ export default function DocumentAnalytics(props: DocumentAnalyticsProps) {
         const uniqueViews = analyticsData?.uniqueViewers?.results?.find(([d]: [string]) => normalizeDate(d) === date)?.[1] ?? 0;
         const timeSpent = analyticsData?.timeOnPage?.results?.find(([d]: [string]) => normalizeDate(d) === date)?.[1] ?? 0;
         const CTAClicks = analyticsData?.CTAClicks?.results?.find(([d]: [string]) => normalizeDate(d) === date)?.[1] ?? 0;
-
+        const scrollDepth = analyticsData?.scrollDepth?.results?.find(([d]: [string]) => normalizeDate(d) === date)?.[1] ?? 0;
         return {
             date,
             views,
@@ -110,6 +108,7 @@ export default function DocumentAnalytics(props: DocumentAnalyticsProps) {
             timeSpent,
             timeSpentFormatted: formatDuration(timeSpent),
             CTAClicks,
+            scrollDepth
         };
     });
 
@@ -256,16 +255,19 @@ export default function DocumentAnalytics(props: DocumentAnalyticsProps) {
                                     </div>
 
                                     <Separator className="mt-4 mb-4" />
-                                    <div className="font-semibold mb-2">Access info</div>
+                                    <div className="flex gap-2 items-center justify-between">
+                                        <div className="font-semibold mb-2">Access Info</div>
+
+                                        <div className="flex">
+                                            <Table2 className="cursor-pointer" onClick={() => setGraphData("demographics")} />
+                                        </div>
+                                    </div>
                                     <div className="flex gap-6">
                                         <div>
                                             <div className="flex flex-col">Viewer geography</div>
-                                            <div className="text-xl">-</div>
+                                            <div className="text-xl">{analyticsData?.topCountry?.country}</div>
                                         </div>
-                                        <div>
-                                            <div className="flex flex-col">Referrer Info</div>
-                                            <div className="text-xl">-</div>
-                                        </div>
+                                        
 
                                     </div>
                                     <Separator className="mt-4 mb-4" />
@@ -282,7 +284,7 @@ export default function DocumentAnalytics(props: DocumentAnalyticsProps) {
                                 {activeSection === 'table' && (
                                     <div className="grid gap-8">
                                         <div>
-                                            <h3 className="text-lg font-semibold mb-2">Document Viewer Table</h3>
+                                            <ViewsTable views={analyticsData?.viewsTable || []}/>
                                         </div>
 
 
@@ -335,25 +337,26 @@ export default function DocumentAnalytics(props: DocumentAnalyticsProps) {
                                         </div>
 
                                         <div>
-                                            <h3 className="text-lg font-semibold mb-2">Scroll Rate per Day</h3>
-                                            <ResponsiveContainer width="100%" height={300}>
-                                                <LineChart data={graphData}>
-                                                    <CartesianGrid strokeDasharray="3 3" />
-                                                    <XAxis
-                                                        dataKey="date"
-                                                        tickFormatter={(date) =>
-                                                            new Date(date).toLocaleDateString("en-GB", { day: "numeric", month: "short" })
-                                                        }
-                                                    />
-                                                    <YAxis label={{ value: 'Seconds', angle: -90, position: 'insideLeft' }} />
-                                                    <Tooltip
-                                                        formatter={(value: number) => formatDuration(value)}
-                                                    />
-
-                                                    <Line type="monotone" dataKey="timeSpent" stroke="#ff7300" name="Time Spent" />
-                                                </LineChart>
-                                            </ResponsiveContainer>
+                                        <Graph
+                                                title="Scroll Rate per Day"
+                                                graphData={graphData}
+                                                line={[
+                                                    { label: "Daily Scroll Rate", dataKey: "scrollDepth", strokeColor: "#ff7300" },
+                                                ]}
+                                                formatDuration={formatDuration}
+                                                label="Scroll Depth"
+                                            />          
+                                           
                                         </div>
+                                    </div>
+                                )}
+                                 {activeSection === 'demographics' && (
+                                    <div className="grid gap-8">
+                                        <GeoTable
+                                            graphData={analyticsData?.geoBreakdown}
+                                        />
+                                    
+
                                     </div>
                                 )}
                             </div>

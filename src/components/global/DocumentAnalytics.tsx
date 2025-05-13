@@ -2,6 +2,8 @@
 
 import { useEffect } from 'react';
 import posthog from '@/lib/postHog';
+import { v4 } from "uuid";
+
 
 type Props = {
   documentId: string;
@@ -9,14 +11,18 @@ type Props = {
   domain: string;
 };
 
+const sessionId = sessionStorage.getItem("doc_session") || v4();
+sessionStorage.setItem("doc_session", sessionId);
+
 const DocumentAnalytics = ({ documentId, pageId, domain }: Props) => {
   useEffect(() => {
     posthog.capture('document_viewed', {
       documentId,
       pageId,
       domain,
+      sessionId,
     });
-  }, [documentId, pageId, domain]);
+  }, [documentId, pageId, domain, sessionId]);
 
   return null;
 };
