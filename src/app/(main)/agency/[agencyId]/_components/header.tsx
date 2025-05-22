@@ -27,6 +27,7 @@ import { deleteWorkspace } from '@/lib/queries'
 import { toast } from '@/components/ui/use-toast'
 import { useRouter } from 'next/navigation'
 import { ScrollArea } from '@/components/ui/scroll-area'
+import { useUserStore } from '@/lib/store/useUserStore'
 
 
   
@@ -38,6 +39,7 @@ type Props = {
 
 const Header = (props: Props) => {
         const router = useRouter()
+       const { role } = useUserStore()
     
 
   const handleDelete = async (id: string) => {
@@ -55,7 +57,7 @@ const Header = (props: Props) => {
     return (
         <div className='flex items-center justify-between w-full'>
             <div className='text-lg text-primary font-bold flex items-center'>
-                {props.workspace.name} 
+                {props.workspace.name} : role {role}
                 <HoverCard>
                     <HoverCardTrigger><Info size={20} className='text-primary ml-1' /></HoverCardTrigger>
                     <HoverCardContent>

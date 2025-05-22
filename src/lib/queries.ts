@@ -8,8 +8,7 @@ import { v4 } from "uuid";
 import { CreateDocumentFormSchema, CreateMediaType, CreateWorkspaceFormSchema, UpsertDocumentPage} from "./types";
 import { z } from "zod";
 
-import { revalidatePath } from "next/cache";
-import { id } from "date-fns/locale";
+
 
 
 export const getAuthUserDetails =async () => {
@@ -86,7 +85,7 @@ export const saveActivityLogsNotification = async ({
 }
 
 export const createTeamUser =async (agencyId:string, user: User) => {
-   if(user.role === "AGENCY_OWNER") {
+   if(user.role === "OWNER") {
     return null
    }
    const response = await db.user.create({data: {...user}})
@@ -183,13 +182,13 @@ export const initUser =async (newUser: Partial<User>) => {
             avatarUrl: user.imageUrl,
             email: user.emailAddresses[0].emailAddress,
             name: `${user.firstName} ${user.lastName}`,
-            role: newUser.role || 'SUBACCOUNT_USER'
+            role: newUser.role || 'OWNER'
         }
     })
 
     await clerkClient.users.updateUserMetadata(user.id , {
         privateMetadata: {
-            role: newUser.role || 'SUBACCOUNT_USER',
+            role: newUser.role || 'USER',
 
         },
     })
@@ -233,6 +232,18 @@ export const getNotificationsAndUser =async (agencyId:string) => {
     }
 }
 
+export async function getAgencyAndUsers(agencyId: string) {
+    const agency = await db.agency.findUnique({ where: { id: agencyId } });
+    const users = await db.user.findMany({
+      where: {
+        Agency: {
+          id: agencyId,
+        },
+      },
+    });
+    return { agency, users };
+  }
+
 
 
 
@@ -246,7 +257,7 @@ export const updateUser = async (user: Partial<User>) => {
 
     await clerkClient.users.updateUserMetadata(response.id, {
         privateMetadata: {
-            role: user.role || "SUBACCOUNT_USER",
+            role: user.role || "USER",
         },
     });
     return response
@@ -280,6 +291,7 @@ export const getUser = async (id: string) => {
 }
 
 export const sendInvitation = async (
+    
     role: Role,
     email: string,
     agencyId: string
@@ -287,7 +299,6 @@ export const sendInvitation = async (
     const response = await db.invitation.create({
         data: {email, agencyId, role},
     })
-
     try {
         const invitation = await clerkClient.invitations.createInvitation({
             emailAddress: email,

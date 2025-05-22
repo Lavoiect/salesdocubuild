@@ -1,6 +1,8 @@
 import AgencyDetails from "@/components/forms/agency-details";
 import { IdentifyUserClient } from "@/components/global/IdentifyUserClient";
+import SetUserRoleClient from "@/components/global/SetUserRoleClient";
 import { getAuthUserDetails, verifyAndAcceptInvitation } from "@/lib/queries";
+import { useUserStore } from "@/lib/store/useUserStore";
 import { currentUser } from "@clerk/nextjs";
 import { Plan } from "@prisma/client";
 import { redirect } from "next/navigation";
@@ -9,21 +11,23 @@ import React from "react";
 
 
 
+
 const Page = async ({searchParams}: 
     {searchParams: {plan: Plan; state: string; code: string}}) => {
 
     const agencyId = await verifyAndAcceptInvitation()
-    console.log('agencyID'+agencyId)
+    //console.log('agencyID'+agencyId)
 
     //Get user details
     const user = await getAuthUserDetails()
 
 
-
+    
+      
 
     if(agencyId){
        
-        if(user?.role === "AGENCY_OWNER" || user?.role === "AGENCY_ADMIN"){
+        if(user?.role === "OWNER"){
             if(searchParams.plan){
                 return redirect(`/agency/${agencyId}/billing?plan=${searchParams.plan}`)
             }
@@ -44,6 +48,7 @@ const Page = async ({searchParams}:
         
             <div className="flex justify-center items-center mt-4">
                 <div className="max-w-[850px] border-[1px] p-4 rounded-xl">
+               
                 {user && user.Agency && (
                     <IdentifyUserClient 
                         user={{

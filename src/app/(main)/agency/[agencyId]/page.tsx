@@ -1,6 +1,6 @@
 
 import { db } from "@/lib/db";
-import { getWorkspaces } from "@/lib/queries";
+import { getAuthUserDetails, getWorkspaces } from "@/lib/queries";
 
 import { currentUser } from "@clerk/nextjs";
 import React from "react";
@@ -10,6 +10,7 @@ import WorkspaceCard from "./_components/workspace-card";
 import { CreateTemplatetBnt } from "./_components/create-template-btn";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import TemplateCard from "./_components/template-card";
+import SetUserRoleClient from "@/components/global/SetUserRoleClient";
 
 
 const Page = async ({ params }: {
@@ -18,6 +19,7 @@ const Page = async ({ params }: {
     }
 }) => {
 
+    const userRole = await getAuthUserDetails()
 
     const agencyDetails = await db.agency.findUnique({
         where: {
@@ -36,6 +38,7 @@ const Page = async ({ params }: {
 
     return (
         <div className="container">
+            <SetUserRoleClient role={userRole?.role ?? "defaultRole"} />
         <Tabs defaultValue="workspace">
             <TabsList>
                 <TabsTrigger value="workspace">Workspaces</TabsTrigger>

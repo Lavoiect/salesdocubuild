@@ -51,30 +51,32 @@ export default function ViewsTable({ views, perPage = 10 }: Props) {
           </TableRow>
         </TableHeader>
         <TableBody>
-          {paginated.map((view, index) => (
-            <TableRow key={index}>
-              <TableCell>{new Date(view.timestamp).toLocaleDateString()}</TableCell>
+          {paginated
+            .filter((view) => !!view.timeSpent)
+            .map((view, index) => (
+              <TableRow key={index}>
+                <TableCell>{new Date(view.timestamp).toLocaleDateString()}</TableCell>
+                <TableCell>{view.country || "-"}</TableCell>
+                <TableCell>{view.region || "-"}</TableCell>
+                <TableCell>{view.zip || "-"}</TableCell>
+                <TableCell>
+                  {view.timeSpent
+                    ? (() => {
+                      const minutes = Math.floor(view.timeSpent / 60);
+                      const seconds = Math.round(view.timeSpent % 60);
+                      return minutes > 0
+                        ? `${minutes} min${seconds > 0 ? ` ${seconds} sec` : ""}`
+                        : `${seconds} sec`;
+                    })()
+                    : "-"}
+                </TableCell>
+                <TableCell>
+                  {view.scrollDepth ? `${Math.round(view.scrollDepth)}%` : "-"}
+                </TableCell>
+                <TableCell>{view.ctaClicked ? "Yes" : "No"}</TableCell>
+              </TableRow>
+            ))}
 
-              <TableCell>{view.country || "-"}</TableCell>
-              <TableCell>{view.region || "-"}</TableCell>
-              <TableCell>{view.zip || "-"}</TableCell>
-              <TableCell>
-                {view.timeSpent
-                  ? (() => {
-                    const minutes = Math.floor(view.timeSpent / 60);
-                    const seconds = Math.round(view.timeSpent % 60);
-                    return minutes > 0
-                      ? `${minutes} min${seconds > 0 ? ` ${seconds} sec` : ""}`
-                      : `${seconds} sec`;
-                  })()
-                  : "-"}
-              </TableCell>
-              <TableCell>
-                {view.scrollDepth ? `${Math.round(view.scrollDepth)}%` : "-"}
-              </TableCell>
-              <TableCell>{view.ctaClicked ? "Yes" : "No"}</TableCell>
-            </TableRow>
-          ))}
         </TableBody>
       </Table>
 

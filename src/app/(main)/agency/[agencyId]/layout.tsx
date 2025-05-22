@@ -3,7 +3,6 @@ import { currentUser } from "@clerk/nextjs";
 import { redirect } from "next/navigation";
 import React from "react";
 import Unauthorized from "../unauthorized/page";
-import BlurPage from "@/components/global/blur-page";
 import InfoBar from "@/components/global/info-bar";
 import SideBar from "@/components/global/side-bar";
 
@@ -25,8 +24,8 @@ const layout = async ({children, params}: Props) => {
     }
 
     if(
-        user.privateMetadata.role !== 'AGENCY_OWNER' &&
-        user.privateMetadata.role !== 'AGENCY_ADMIN'
+        user.privateMetadata.role !== 'OWNER'
+        
     )
 
     return <Unauthorized/>;

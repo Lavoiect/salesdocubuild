@@ -20,7 +20,7 @@ const SendInvitation: React.FC<sendInvitationProps> = ({ agencyId }) => {
     const {toast} = useToast()
     const userDataSchema = z.object({
         email: z.string().email(),
-        role: z.enum(['AGENCY_ADMIN', 'SUBACCOUNT_USER', 'SUBACCOUNT_GUEST'])
+        role: z.enum(['ADMIN', 'USER', 'GUEST'])
     })
 
     const form = useForm<z.infer<typeof userDataSchema>>({
@@ -28,7 +28,7 @@ const SendInvitation: React.FC<sendInvitationProps> = ({ agencyId }) => {
         mode: 'onChange',
         defaultValues: {
             email: '',
-            role: "SUBACCOUNT_USER",
+            role: 'USER',
             // TODO: add initial permission
         },
     })
@@ -39,7 +39,6 @@ const SendInvitation: React.FC<sendInvitationProps> = ({ agencyId }) => {
             await saveActivityLogsNotification({
                 agencyId: agencyId,
                 description: `Invited ${values.email}`,
-                subaccountId: undefined
             })
             toast({
                 title: 'Sucess',
@@ -105,13 +104,11 @@ const SendInvitation: React.FC<sendInvitationProps> = ({ agencyId }) => {
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        <SelectItem value="AGENCY_ADMIN">Agency Admin</SelectItem>
-                                        <SelectItem value="SUBACCOUNT_USER">
-                                            Sub Account User
+                                        <SelectItem value="ADMIN">Admin</SelectItem>
+                                        <SelectItem value="USER">
+                                            User
                                         </SelectItem>
-                                        <SelectItem value="SUBACCOUNT_GUEST">
-                                            Sub Account Guest
-                                        </SelectItem>
+                                        
                                     </SelectContent>
                                 </Select>
                                 <FormMessage/>

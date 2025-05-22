@@ -15,10 +15,10 @@ generator client {
 }
 
 enum Role {
-  AGENCY_OWNER
-  AGENCY_ADMIN
-  SUBACCOUNT_USER
-  SUBACCOUNT_GUEST
+  OWNER //Payment management
+  ADMIN //Inivte Users, Manage Users, Manage Agency
+  USER //Create Document, Create Pages, Create ClassName
+  GUEST //View Document, View Pages
 }
 
 enum Icon {
@@ -61,7 +61,7 @@ model User {
   email        String         @unique
   createdAt    DateTime       @default(now())
   updatedAt    DateTime       @updatedAt
-  role         Role           @default(SUBACCOUNT_USER)
+  role         Role           @default(USER)
   agencyId     String?
   Agency       Agency?        @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   
@@ -214,7 +214,7 @@ model Invitation {
   agencyId String
   Agency   Agency           @relation(fields: [agencyId], references: [id], onDelete: Cascade)
   status   InvitationStatus @default(PENDING)
-  role     Role             @default(SUBACCOUNT_USER)
+  role     Role             @default(USER)
 
   @@index([agencyId])
 }

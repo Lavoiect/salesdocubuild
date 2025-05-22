@@ -9,6 +9,8 @@ import { Search } from "lucide-react"
 import { Input } from "@/components/ui/input"
 import { Button } from "@/components/ui/button"
 import CustomModal from "@/components/global/custom-modal"
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+
 
 interface DataTableProps<TData, TValue> {
     columns: ColumnDef<TData, TValue>[]
@@ -48,6 +50,25 @@ export default function DataTable<TData, TValue>({
                         }}
                         className="h-12"
                     />
+                    
+                    {table.getColumn("role") && (
+    
+      <Select
+        onValueChange={(value) => {
+          table.getColumn("role")?.setFilterValue(value === "all" ? undefined : value)
+        }}
+      >
+        <SelectTrigger className="w-[280px] h-12">
+          <SelectValue placeholder="Filter by Role" />
+        </SelectTrigger>
+        <SelectContent>
+          <SelectItem value="all">All Roles</SelectItem>
+          <SelectItem value="OWNER">Owner</SelectItem>
+          <SelectItem value="ADMIN">Admin</SelectItem>
+          <SelectItem value="USER">User</SelectItem>
+        </SelectContent>
+      </Select>
+    )}
                 </div>
                 <Button 
                     className="flex gap-2"

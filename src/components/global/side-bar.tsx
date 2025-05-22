@@ -17,8 +17,8 @@ const SideBar = ({agencyId}: Props) => {
        <Link className={pathname == `/agency/${agencyId}` ? "text-gray-300" : ""} href={`/agency/${agencyId}`} ><File size={30}/></Link> 
        <Link className={pathname == `/agency/${agencyId}/analytics` ? "text-gray-300" : ""} href={`/agency/${agencyId}/analytics`}><BarChartBig size={30}/></Link> 
        <Link className={pathname == `/agency/${agencyId}/media` ? "text-gray-300" : ""} href={`/agency/${agencyId}/media`} ><Paperclip size={30}/></Link> 
-       <Link href={`/agency/${agencyId}/settings`} ><User size={30}/></Link> 
-       <Link href={`/agency/${agencyId}/settings`} ><Settings size={30}/></Link> 
+       <Link className={pathname == `/agency/${agencyId}/team` ? "text-gray-300" : ""} href={`/agency/${agencyId}/team`} ><User size={30}/></Link> 
+       <Link className={pathname == `/agency/${agencyId}/settings` ? "text-gray-300" : ""} href={`/agency/${agencyId}/settings`} ><Settings size={30}/></Link> 
     </div>
   )
 }

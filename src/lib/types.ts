@@ -19,25 +19,26 @@ export type NotificationWithUser =
     } & Notification)[]
     | undefined
 
-const __getUsersWithAgencySubAccountPermissionsSideBarOptions = async (
+const __getUsersFromAgency = async (
     agencyId: string
 ) => {
     return await db.user.findFirst({
-        where: { Agency: { id: agencyId } },
-        include: {
-            Agency: { include: { SubAccount: true } },
-            Permissions: { include: { SubAccount: true } }
-        }
+        where: { Agency: { id: agencyId }, role: "SUPER_ADMIN", },
+        
+        
     })
 }
 
 
-export type UserWithPermissionsAndSubAccounts = Prisma.PromiseReturnType<typeof getUserPermissions>
 
-export type AuthUserWithAgencySideBarOptionsandSubAccounts = Prisma.PromiseReturnType<typeof getAuthUserDetails>
 
-export type UsersWithAgencySubAccountPermissionsSidebarOptions =
-    Prisma.PromiseReturnType<typeof __getUsersWithAgencySubAccountPermissionsSideBarOptions>
+
+export type AuthUserWithAgency = Prisma.PromiseReturnType<typeof getAuthUserDetails>
+
+export type UsersFromAgency =
+    Prisma.PromiseReturnType<typeof __getUsersFromAgency>
+
+
 
 export type GetMediaFiles = Prisma.PromiseReturnType<typeof getMedia>
 

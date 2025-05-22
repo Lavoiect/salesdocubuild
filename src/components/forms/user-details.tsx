@@ -1,11 +1,11 @@
 'use client'
-import { AuthUserWithAgencySideBarOptionsandSubAccounts, UserWithPermissionsAndSubAccounts } from "@/lib/types";
+import { AuthUserWithAgency} from "@/lib/types";
 import { useModal } from "@/providers/modal-provider";
-import { SubAccount, User } from "@prisma/client";
+import {  User } from "@prisma/client";
 import React, { useEffect, useState } from "react";
 import { useToast } from "../ui/use-toast";
 import { useRouter } from "next/navigation";
-import { changeUserPermissions, getAuthUserDetails, getUserPermissions, saveActivityLogsNotification, updateUser } from "@/lib/queries";
+import { getAuthUserDetails, updateUser} from "@/lib/queries";
 import { z } from "zod";
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
@@ -17,25 +17,21 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from ".
 import { Button } from "../ui/button";
 import Loading from "../global/loading";
 import { Separator } from "../ui/separator";
-import { Switch } from "../ui/switch";
-import { v4 } from "uuid";
+
 
 
 type Props = {
     id: string | null
-    type: 'agency' | 'subaccount'
+    type: 'agency'
     userData?: Partial<User>
-    subAccounts?: SubAccount[]
 }
 
-const UserDetails = ({id, type, userData, subAccounts}: Props) => {
-    const [subAccountPermissions, setSubAccountPermissions] = 
-    useState<UserWithPermissionsAndSubAccounts | null>(null)
+const UserDetails = ({id, type, userData}: Props) => {
+   
 
     const {data, setClose} = useModal()
     const [roleState, setRoleState] = useState('')
-    const [loadingPermissions, setLoadingPermissions] = useState(false)
-    const [authUserData, setAuthUserData] = useState<AuthUserWithAgencySideBarOptionsandSubAccounts | null>(null)
+    const [authUserData, setAuthUserData] = useState<AuthUserWithAgency | null>(null)
     const {toast} = useToast()
     const router = useRouter()
 
@@ -54,10 +50,9 @@ const UserDetails = ({id, type, userData, subAccounts}: Props) => {
         email: z.string().email(),
         avatarUrl: z.string(),
         role: z.enum([
-            'AGENCY_OWNER',
-            'AGENCY_ADMIN',
-            'SUBACCOUNT_USER',
-            'SUBACCOUNT_GUEST',
+            'OWNER',
+            'ADMIN',
+            'USER',
         ]),
     })
 
@@ -68,83 +63,34 @@ const UserDetails = ({id, type, userData, subAccounts}: Props) => {
             name: userData ? userData.name : data?.user?.name,
             email: userData ? userData.email : data?.user?.email,
             avatarUrl: userData ? userData.avatarUrl : data?.user?.avatarUrl,
-            role: userData ? userData.role : data?.user?.role,
+            role: userData && ["OWNER", "ADMIN", "USER"].includes(userData.role as string)
+                ? (userData.role as "OWNER" | "ADMIN" | "USER")
+                : data?.user?.role && ["OWNER", "ADMIN", "USER"].includes(data.user.role as string)
+                ? (data.user.role as "OWNER" | "ADMIN" | "USER")
+                : undefined,
 
         }
     })
 
-    useEffect(() => {
-        if(!data.user) return 
-        const getPermissions = async () => {
-            if(!data.user) return
-            const permissions = await getUserPermissions(data.user.id)
-            setSubAccountPermissions(permissions)
-        }
-        getPermissions()
-    }, [data, form])
-
+   
     useEffect(() => {
         if(data.user){
-            form.reset(data.user)
+            form.reset({
+                name: data.user.name,
+                avatarUrl: data.user.avatarUrl,
+                email: data.user.email,
+                role: data.user.role as "OWNER" | "ADMIN" | "USER",
+            })
         }
         if (userData) {
-            form.reset(userData)
+            form.reset({
+                ...userData,
+                role: userData?.role as "OWNER" | "ADMIN" | "USER" | undefined,
+            })
         }
     }, [userData, data])
 
-    const onChangePermission = async (subAccountId: string, val: boolean, permissionsId: string | undefined) => {
-        if (!data.user?.email){
-            return 
-        }
-        await saveActivityLogsNotification({
-            //agencyId: subAccountId,
-            description: `Changed ${data.user.name} Permissions`,
-            subaccountId: subAccountId
-        })
-        setLoadingPermissions(true)
-        const response = await changeUserPermissions(
-            permissionsId ? permissionsId : v4(),
-            data.user.email,
-            subAccountId,
-            val
-        )
-        if(type === 'agency'){
-            await saveActivityLogsNotification({
-                agencyId: authUserData?.Agency?.id,
-                description: `Gave ${userData?.name} access to | ${
-                    subAccountPermissions?.Permissions.find(
-                        (p) => p.subAccountId === subAccountId
-                    )?.SubAccount.name
-                }`,
-                subaccountId: subAccountPermissions?.Permissions.find(
-                    (p) => p.subAccountId === subAccountId
-                )?.SubAccount.id,
-            })
-        }
-
-        if(response){
-            toast({
-                title: 'Success',
-                description: 'The request was successful',
-            })
-            if(subAccountPermissions){
-                subAccountPermissions.Permissions.find((perm) => {
-                    if(perm.subAccountId === subAccountId) {
-                        return {...PermissionStatus, access: !perm.access}
-                    }
-                        return perm
-                })
-            }
-        } else {
-            toast({
-                variant: 'destructive',
-                title: 'Failed',
-                description: 'Could not update permissions'
-            })
-        }
-        router.refresh()
-        setLoadingPermissions(false)
-    }
+    
             
         
     
@@ -154,17 +100,7 @@ const UserDetails = ({id, type, userData, subAccounts}: Props) => {
         if (!id) return
         if (userData || data?.user) {
           const updatedUser = await updateUser(values)
-          authUserData?.Agency?.SubAccount.filter((subacc) =>
-            authUserData.Permissions.find(
-              (p) => p.subAccountId === subacc.id && p.access
-            )
-          ).forEach(async (subaccount) => {
-            await saveActivityLogsNotification({
-              agencyId: undefined,
-              description: `Updated ${data?.user?.name} information`,
-              subaccountId: subaccount.id,
-            })
-          })
+         
     
           if (updatedUser) {
             toast({
@@ -245,7 +181,7 @@ const UserDetails = ({id, type, userData, subAccounts}: Props) => {
                                    <Input
                                         
                                         readOnly={
-                                            userData?.role === 'AGENCY_OWNER' || 
+                                            userData?.role === 'OWNER' || 
                                             form.formState.isSubmitting
                                         }
                                         required
@@ -265,7 +201,7 @@ const UserDetails = ({id, type, userData, subAccounts}: Props) => {
                             <FormItem className="flex-1">
                                 <FormLabel>User Role:</FormLabel>
                                 <Select
-                                    disabled={field.value === 'AGENCY_OWNER'}
+                                    disabled={field.value === 'OWNER'}
                                     onValueChange={(value) => {
                                         if(
                                             value === "SUBACCOUNT_USER" ||
@@ -287,17 +223,15 @@ const UserDetails = ({id, type, userData, subAccounts}: Props) => {
                                         </SelectTrigger>
                                     </FormControl>
                                     <SelectContent>
-                                        <SelectItem value="AGENCY_ADMIN">Agency Admin</SelectItem>
-                                        {(data?.user?.role ==='AGENCY_OWNER' || userData?.role ==="AGENCY_OWNER")
+                                        <SelectItem value="ADMIN">Admin</SelectItem>
+                                        {(data?.user?.role ==='OWNER' || userData?.role ==="OWNER")
                                         && (
-                                            <SelectItem value="AGENCY_OWNER">Agency Owner</SelectItem>
+                                            <SelectItem value="OWNER">Owner</SelectItem>
                                         )}
-                                        <SelectItem value="SUBACCOUNT_USER">Sub Account User</SelectItem>
-                                        <SelectItem value="SUBACCOUNT_GUEST">Sub Account Guest</SelectItem>
+                                        <SelectItem value="USER">User</SelectItem>
 
                                     </SelectContent>
                                 </Select>
-                                <p className="text-muted-foreground">{roleState}</p>
                             </FormItem>
                          )}
                         />
@@ -308,8 +242,7 @@ const UserDetails = ({id, type, userData, subAccounts}: Props) => {
                             {form.formState.isSubmitting ? <Loading/> : 'Save User Details'}
                         </Button>
                         
-                        {authUserData?.role}
-                        {authUserData?.role === 'AGENCY_OWNER' && (
+                        {authUserData?.role === 'OWNER' && (
                             <div>
                                 <Separator className="my-4"/>
                                 <FormLabel>User Permissions</FormLabel>
@@ -317,31 +250,7 @@ const UserDetails = ({id, type, userData, subAccounts}: Props) => {
                                     You can give Sub Account access to team members by turning
                                     on access control for each sub account. This is only visible to agency owners.
                                 </FormDescription>
-                                <div className="flex flex-col gap-4">
-                                    {subAccounts?.map((subAccount) => {
-                                        const subAccountPermissionDetails = 
-                                        subAccountPermissions?.Permissions.find(
-                                            (p) => p.subAccountId === subAccount.id
-                                        )
-                                        return (
-                                            <div
-                                            key={subAccount.id}
-                                            className="flex items-center justify-between rounded-lg border p-4"
-                                            >
-                                                <div>
-                                                    <p>{subAccount.name}</p>
-                                                </div>
-                                                <Switch 
-                                                    disabled= {loadingPermissions}
-                                                    checked={subAccountPermissionDetails?.access}
-                                                    onCheckedChange={(permission) => {
-                                                        onChangePermission(subAccount.id, permission, subAccountPermissionDetails?.id)
-                                                    }}
-                                                />
-                                            </div>
-                                        )
-                                    })}
-                                </div>
+                               
                             </div>
                         )}
                     </form>
